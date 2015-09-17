@@ -1,2 +1,2 @@
 # scorage
-An adaptable core for storing and accessing results and statistics of competitive events
+An adaptable core for tracking results and statistics of competitive events
