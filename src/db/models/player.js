@@ -1,45 +1,22 @@
-const datastore = require('../datastore');
-const Sequelize = require('sequelize');
+const db = require('../client');
+const isNil = require('../../util').isNil;
 
-const player = datastore.define('player', {
-	id: {
-		type: Sequelize.INTEGER,
-		allowNull: false,
-		unique: true,
-		primaryKey: true,
-		autoIncrement: true
-	},
-	firstName: {
-		type: Sequelize.TEXT,
-		field: 'first_name'
-	},
-	middleName: {
-		type: Sequelize.TEXT,
-		field: 'middle_name'
-	},
-	lastName: {
-		type: Sequelize.TEXT,
-		field: 'last_name'
-	},
-	nickname: {
-		type: Sequelize.TEXT,
-		allowNull: false
-	},
-	email: {
-		type: Sequelize.TEXT
-	},
-	phone: {
-		type: Sequelize.TEXT
-	},
-	address: {
-		type: Sequelize.TEXT
-	},
-	description: {
-		type: Sequelize.TEXT
-	},
-	website: {
-		type: Sequelize.TEXT
-	},
-});
+const player = (() => {
+	const GET = (options) => {
+		let fields = '*';
+		if (!isNil(options) && !isNil(options.fields)) {
+			fields = options.fields;
+		}
+
+		return db.makeRequest(`SELECT ${fields} FROM player`)
+			.then((result) => {
+				return Promise.resolve(result.rows);
+			});
+	};
+
+	return Object.freeze({
+		get: GET
+	});
+})();
 
 module.exports = player;
