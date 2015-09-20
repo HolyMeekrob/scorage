@@ -12,17 +12,17 @@ const client = (() => {
 
 	const makeRequest = (query) => {
 		return new Promise((resolve, reject) => {
-			pg.connect(config, (err, pgClient, done) => {
-				if (err) {
+			pg.connect(config, (connectErr, pgClient, done) => {
+				if (connectErr) {
 					return reject(
-						`Error establishing connection to the database: ${err}`);
+						`Error establishing connection to the database: ${connectErr}`);
 				}
 
-				pgClient.query(query, (err, result) => {
+				pgClient.query(query, (queryErr, result) => {
 					done();
 
-					if (err) {
-						return reject(`Error running query: ${err}`);
+					if (queryErr) {
+						return reject(`Error running query: ${queryErr}`);
 					}
 
 					return resolve(result);
