@@ -1,21 +1,21 @@
 const db = require('../client');
+const queryBuilder = require('./queryBuilder');
 const isNil = require('../../util').isNil;
 
 const player = (() => {
-	const GET = (options) => {
-		let fields = '*';
-		if (!isNil(options) && !isNil(options.fields)) {
-			fields = options.fields;
-		}
+	const tableName = 'player';
 
-		return db.makeRequest(`SELECT ${fields} FROM player`)
+	const read = (options) => {
+		const query = queryBuilder.select(tableName, options);
+
+		return db.makeRequest(query)
 			.then((result) => {
 				return Promise.resolve(result.rows);
 			});
 	};
 
 	return Object.freeze({
-		get: GET
+		get: read
 	});
 })();
 

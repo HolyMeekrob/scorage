@@ -14,10 +14,7 @@ gulp.task('default', ['lint'], () => {
 	nodemon({
 		script: 'index.js',
 		ext: 'js',
-		env: { 'NODE_ENV': 'development' },
-		execMap: {
-			js: 'node --use_strict'
-		}
+		env: { 'NODE_ENV': 'development' }
 	});
 });
 
