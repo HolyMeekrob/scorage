@@ -23,9 +23,48 @@ const util = (() => {
 		return arr[0];
 	};
 
+	const isIterable = (obj) => {
+		if (isNil(obj)) {
+			return false;
+		}
+
+		return obj[Symbol.iterator] !== undefined;
+	};
+
+	const includes = (source, val) => {
+		if (!isIterable(source)) {
+			throw new ('Iterable is required');
+		}
+
+		const arr = Array.from(source);
+		return any(arr.filter((elem) => {
+			return elem === val;
+		}));
+	};
+
+	const any = (iter) => {
+		if (!isIterable(iter)) {
+			throw new Error('Must be an iterator');
+		}
+
+		return !iter[Symbol.iterator]().next().done;
+	};
+
+	const difference = (a, b) => {
+		if (!isIterable(a) || !isIterable(b)) {
+			throw new Error('Iterables required');
+		}
+
+		return Array.from(a).filter((elem) => !includes(b, elem));
+	};
+
 	return Object.freeze({
 		isNil,
-		single
+		single,
+		isIterable,
+		includes,
+		any,
+		difference
 	});
 })();
 
