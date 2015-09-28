@@ -1,28 +1,31 @@
-const isNil = require('../../util').isNil;
+import { isNil } from '../../util';
 
 const options = () => {
-	const checkFields = (fields) => {
-		if (isNil(fields)) {
+	let fields = [];
+	let conditions = [];
+
+	const checkFields = (fieldsToCheck) => {
+		if (isNil(fieldsToCheck)) {
 			return true;
 		}
 
-		if (!Array.isArray(fields)) {
+		if (!Array.isArray(fieldsToCheck)) {
 			throw new Error('Query fields must be an array');
 		}
 
 		return true;
 	};
 
-	const checkConditions = (conditions) => {
-		if (isNil(conditions)) {
+	const checkConditions = (conditionsToCheck) => {
+		if (isNil(conditionsToCheck)) {
 			return true;
 		}
 
-		if (!Array.isArray(conditions)) {
+		if (!Array.isArray(conditionsToCheck)) {
 			throw new Error('Query conditions must be an array');
 		}
 
-		const invalidConditions = conditions.filter((condition) => {
+		const invalidConditions = conditionsToCheck.filter((condition) => {
 			return (!Array.isArray(condition) || condition.length !== 2);
 		});
 
@@ -35,21 +38,21 @@ const options = () => {
 	};
 
 	const getFields = () => {
-		return this.fields;
+		return fields.slice(0);
 	};
 
-	const setFields = (fields) => {
-		checkFields(fields);
-		this.fields = [].concat(fields).filter((field) => !isNil(field));
+	const setFields = (newFields) => {
+		checkFields(newFields);
+		fields = [].concat(newFields).filter((field) => !isNil(field));
 	};
 
 	const getConditions = () => {
-		return this.conditions;
+		return new Map(conditions);
 	};
 
-	const setConditions = (conditions) => {
-		checkConditions(conditions);
-		this.conditions = new Map(conditions);
+	const setConditions = (newConditions) => {
+		checkConditions(newConditions);
+		conditions = new Map(newConditions);
 	};
 
 	return Object.freeze({
@@ -73,4 +76,4 @@ const optionsBuilder = (() => {
 	});
 })();
 
-module.exports = optionsBuilder;
+export default optionsBuilder;

@@ -1,4 +1,4 @@
-const playerController = require('./controllers/playerController');
+import playerController from './controllers/playerController';
 
 const router = (app) => {
 	const register = (controller) => {
@@ -15,4 +15,4 @@ const router = (app) => {
 	});
 };
 
-module.exports = router;
+export default router;

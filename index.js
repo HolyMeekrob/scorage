@@ -1,5 +1,8 @@
-const app = require('koa')();
-const router = require('./src/router')(app);
+import koa from 'koa';
+const app = koa();
+
+import routerBuilder from './src/router';
+const router = routerBuilder(app);
 
 router.registerRoutes();
 

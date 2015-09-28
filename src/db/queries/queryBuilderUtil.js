@@ -1,5 +1,4 @@
-const util = require('../../util');
-const isNil = util.isNil;
+import { isNil } from '../../util';
 
 const queryBuilderUtil = (() => {
 	const isTableNameValid = (schema) => {
@@ -61,4 +60,4 @@ const queryBuilderUtil = (() => {
 	});
 })();
 
-module.exports = queryBuilderUtil;
+export default queryBuilderUtil;

@@ -1,6 +1,6 @@
-const optionsBuilder = require('./optionsBuilder');
-const isTableNameValid = require('./queryBuilderUtil').isTableNameValid;
-const isNil = require('../../util').isNil;
+import optionsBuilder from './optionsBuilder';
+import { isTableNameValid } from './queryBuilderUtil';
+import { isNil } from '../../util';
 
 const selectQueryBuilder = (() => {
 	const getFieldsString = (fields) => {
@@ -56,4 +56,4 @@ const selectQueryBuilder = (() => {
 	});
 })();
 
-module.exports = selectQueryBuilder;
+export default selectQueryBuilder;

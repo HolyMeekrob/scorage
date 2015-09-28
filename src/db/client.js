@@ -1,4 +1,4 @@
-const pg = require('pg');
+import pg from 'pg';
 
 const client = (() => {
 	const config = {
@@ -36,4 +36,4 @@ const client = (() => {
 	});
 })();
 
-module.exports = client;
+export default client;

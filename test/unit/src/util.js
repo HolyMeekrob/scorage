@@ -1,12 +1,14 @@
-const util = require('../../../src/util');
-const isNil = util.isNil;
-const single = util.single;
-const isIterable = util.isIterable;
-const any = util.any;
-const includes = util.includes;
-const difference = util.difference;
+import {
+	isNil,
+	single,
+	isIterable,
+	any,
+	includes,
+	difference
+} from '../../../src/util';
 
-require('chai').should();
+import chai from 'chai';
+chai.should();
 
 describe('util', () => {
 	describe('#isNil()', () => {

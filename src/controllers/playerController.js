@@ -1,6 +1,8 @@
-const router = require('koa-router')({ prefix: '/players' });
-const koaBody = require('koa-body');
-const playerModel = require('../db/models/player');
+import koaBody from 'koa-body';
+import playerModel from '../db/models/player';
+import koaRouter from 'koa-router';
+const router = koaRouter({ prefix: '/players' });
+
 
 router.get('/', function* (next) {
 	this.type = 'application/json';
@@ -32,4 +34,4 @@ router.post('/players', koaBody, function* (next) {
 	yield next;
 });
 
-module.exports = router;
+export default router;

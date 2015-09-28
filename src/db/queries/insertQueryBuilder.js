@@ -1,12 +1,9 @@
-const util = require('../../util');
-const queryUtil = require('./queryBuilderUtil');
-
-const isNil = util.isNil;
-const difference = util.difference;
-const any = util.any;
-const isTypeMatch = queryUtil.isTypeMatch;
-const isTableNameValid = queryUtil.isTableNameValid;
-const getFormattedValue = queryUtil.getFormattedValue;
+import { isNil, difference, any } from '../../util';
+import {
+	isTypeMatch,
+	isTableNameValid,
+	getFormattedValue
+} from './queryBuilderUtil';
 
 const insertQueryBuilder = (() => {
 	const checkValuesForInsert = (schema, values) => {
@@ -69,4 +66,4 @@ const insertQueryBuilder = (() => {
 	});
 })();
 
-module.exports = insertQueryBuilder;
+export default insertQueryBuilder;

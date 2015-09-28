@@ -1,5 +1,6 @@
-const optionsBuilder = require('../../../../../src/db/queries/optionsBuilder');
-require('chai').should();
+import optionsBuilder from '../../../../../src/db/queries/optionsBuilder';
+import chai from 'chai';
+chai.should();
 
 describe('optionsBuilder', () => {
 	describe('#build()', () => {

@@ -1,5 +1,6 @@
-const queryBuilder = require('../../../../../src/db/queries/queryBuilder');
-require('chai').should();
+import queryBuilder from '../../../../../src/db/queries/queryBuilder';
+import chai from 'chai';
+chai.should();
 
 describe('queryBuilder', () => {
 	describe('#select()', () => {

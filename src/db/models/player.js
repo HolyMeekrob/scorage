@@ -1,7 +1,7 @@
-const db = require('../client');
-const optionsBuilder = require('../queries/optionsBuilder');
-const queryBuilder = require('../queries/queryBuilder');
-const single = require('../../util').single;
+import db from '../client';
+import optionsBuilder from '../queries/optionsBuilder';
+import queryBuilder from '../queries/queryBuilder';
+import { single } from '../../util';
 
 const player = (() => {
 	const schema = {
@@ -112,4 +112,4 @@ const player = (() => {
 	});
 })();
 
-module.exports = player;
+export default player;

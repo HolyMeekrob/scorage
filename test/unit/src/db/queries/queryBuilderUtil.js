@@ -1,8 +1,6 @@
-const util = require('../../../../../src/db/queries/queryBuilderUtil');
-const isTableNameValid = util.isTableNameValid;
-const isTypeMatch = util.isTypeMatch;
-const getFormattedValue = util.getFormattedValue;
-require('chai').should();
+import { isTableNameValid, isTypeMatch, getFormattedValue } from '../../../../../src/db/queries/queryBuilderUtil';
+import chai from 'chai';
+chai.should();
 
 describe('queryBuilderUtil', () => {
 	describe('#isTableNameValid()', () => {

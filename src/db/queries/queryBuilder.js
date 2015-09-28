@@ -1,5 +1,5 @@
-const select = require('./selectQueryBuilder').select;
-const insert = require('./insertQueryBuilder').insert;
+import { select } from './selectQueryBuilder';
+import { insert } from './insertQueryBuilder';
 
 const queryBuilder = (() => {
 	return Object.freeze({
@@ -8,4 +8,4 @@ const queryBuilder = (() => {
 	});
 })();
 
-module.exports = queryBuilder;
+export default queryBuilder;
