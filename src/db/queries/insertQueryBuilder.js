@@ -1,4 +1,4 @@
-import { isNil, difference, any } from '../../util';
+import { isNil, difference, any, intersection } from '../../util';
 import {
 	isTypeMatch,
 	isTableNameValid,
@@ -15,24 +15,31 @@ const insertQueryBuilder = (() => {
 		});
 
 		const missingColumns = difference(requiredColumns, valueColumns);
-
 		if (any(missingColumns)) {
-			throw new Error(`Columns ${missingColumns.join(', ') } are required`);
+			throw new Error(`Columns [${missingColumns.join(', ')}] are required`);
+		}
+
+		const cannotInsertColumns = schemaColumns.filter((col) => {
+			return !schema.columns[col].canCreate;
+		});
+
+		const extraColumns = intersection(cannotInsertColumns, valueColumns);
+		if (any(extraColumns)) {
+			throw new Error(
+				`Columns [${extraColumns.join(', ')}] cannot be inserted`);
 		}
 
 		const invalidColumns = difference(valueColumns, schemaColumns);
-
 		if (any(invalidColumns)) {
-			throw new Error(`Columns ${invalidColumns.join(', ') } are invalid`);
+			throw new Error(`Columns [${invalidColumns.join(', ')}] are invalid`);
 		}
 
 		const typeMismatches = valueColumns.filter((col) => {
 			return !isTypeMatch(values[col], schema.columns[col].type);
 		});
-
 		if (any(typeMismatches)) {
 			throw new Error(
-				`Columns ${typeMismatches.join(', ') } are the wrong type`);
+				`Columns [${typeMismatches.join(', ')}] are the wrong type`);
 		}
 	};
 
@@ -58,7 +65,10 @@ const insertQueryBuilder = (() => {
 		const queryCols = colVals.map((both) => both[0]).join(', ');
 		const queryVals = colVals.map((both) => both[1]).join(', ');
 
-		return `INSERT INTO ${schema.name} (${queryCols}) VALUES (${queryVals})`;
+		return `INSERT INTO ${schema.name} (${queryCols}) VALUES (${queryVals}) \
+			RETURNING *`
+			.trim()
+			.replace(/\t/g, '');
 	};
 
 	return Object.freeze({

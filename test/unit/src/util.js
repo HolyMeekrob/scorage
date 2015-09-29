@@ -4,7 +4,8 @@ import {
 	isIterable,
 	any,
 	includes,
-	difference
+	difference,
+	intersection
 } from '../../../src/util';
 
 import chai from 'chai';
@@ -304,7 +305,7 @@ describe('util', () => {
 			});
 		});
 
-		describe('when given a subset', () => {
+		describe('when given a superset', () => {
 			it('should return an empty array', () => {
 				const a = ['hello', 'there'];
 				const b = ['oh', 'there', 'hello'];
@@ -313,7 +314,7 @@ describe('util', () => {
 			});
 		});
 
-		describe('when given a superset', () => {
+		describe('when given a subset', () => {
 			it('should return the difference', () => {
 				const a = [1, 2, 3, 4, 5];
 				const b = [4, 2];
@@ -355,6 +356,103 @@ describe('util', () => {
 				diff.should.include(2);
 				diff.should.not.include(3);
 				diff.filter((x) => x === 1).length.should.equal(2);
+			});
+		});
+	});
+
+	describe('#intersection()', () => {
+		describe('when given no arguments', () => {
+			it('should throw an error', () => {
+				(() => intersection()).should.throw(Error);
+			});
+		});
+
+		describe('when given a nil second argument', () => {
+			it('should throw an error', () => {
+				(() => intersection([])).should.throw(Error);
+			});
+		});
+
+		describe('when given a first argument that is not iterable', () => {
+			it('should throw an error', () => {
+				(() => intersection(12, [])).should.throw(Error);
+			});
+		});
+
+		describe('when given a second argument that is not iterable', () => {
+			it('should throw an error', () => {
+				(() => intersection([12], 21)).should.throw(Error);
+			});
+		});
+
+		describe('when given identical sets', () => {
+			it('should return the set', () => {
+				const arr = [1, 4, 9];
+
+				const result = intersection(arr, arr);
+
+				result.length.should.equal(3);
+				result.should.include(1);
+				result.should.include(4);
+				result.should.include(9);
+			});
+		});
+
+		describe('when given a superset', () => {
+			it('should return the set', () => {
+				const a = ['hello', 'there'];
+				const b = ['oh', 'there', 'hello'];
+
+				const result = intersection(a, b);
+
+				result.length.should.equal(2);
+				result.should.include('hello');
+				result.should.include('there');
+			});
+		});
+
+		describe('when given a subset', () => {
+			it('should return the subset', () => {
+				const a = [1, 2, 3, 4, 5];
+				const b = [4, 2];
+
+				const result = intersection(a, b);
+				result.length.should.equal(2);
+				result.should.include(4);
+				result.should.include(2);
+			});
+		});
+
+		describe('when given a two sets with elements in common', () => {
+			it('should should return the intersection', () => {
+				const a = [10, 20, 30];
+				const b = [1, 10, 100];
+
+				intersection(a, b).should.deep.equal([10]);
+			});
+		});
+
+		describe('when given two disjoint sets', () => {
+			it('should return an empty array', () => {
+				const a = ['a', 'alpha', 'one'];
+				const b = ['b', 'beta', 'two'];
+
+				intersection(a, b).length.should.equal(0);
+			});
+		});
+
+		describe('when given iterables with duplicates', () => {
+			it('should retain the duplicates', () => {
+				const a = [1, 2, 1, 3];
+				const b = [3, 1, 5];
+
+				const result = intersection(a, b);
+				result.length.should.equal(3);
+				result.should.include(1);
+				result.should.include(3);
+				result.should.not.include(2);
+				result.should.not.include(5);
+				result.filter((x) => x === 1).length.should.equal(2);
 			});
 		});
 	});

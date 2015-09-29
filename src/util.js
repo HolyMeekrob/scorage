@@ -58,13 +58,22 @@ const util = (() => {
 		return Array.from(a).filter((elem) => !includes(b, elem));
 	};
 
+	const intersection = (a, b) => {
+		if (!isIterable(a) || !isIterable(b)) {
+			throw new Error('Iterables required');
+		}
+
+		return Array.from(a).filter((elem) => includes(b, elem));
+	};
+
 	return Object.freeze({
 		isNil,
 		single,
 		isIterable,
 		includes,
 		any,
-		difference
+		difference,
+		intersection
 	});
 })();
 

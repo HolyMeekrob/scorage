@@ -9,7 +9,7 @@ const player = (() => {
 		columns: {
 			id: {
 				type: 'number',
-				required: true,
+				required: false,
 				canCreate: false,
 				canUpdate: false
 			},

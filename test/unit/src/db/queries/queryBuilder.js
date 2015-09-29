@@ -248,7 +248,7 @@ describe('queryBuilder', () => {
 			it('should throw an error', () => {
 				const schema = {
 					name: 123,
-					columns: { prop: { type: 'text' } }
+					columns: { prop: { type: 'text', required: true, canCreate: true } }
 				};
 
 				const vals = {
@@ -274,7 +274,7 @@ describe('queryBuilder', () => {
 			it('should throw an error', () => {
 				const schema = {
 					name: 'tableName',
-					columns: { prop: { type: 'text' } }
+					columns: { prop: { type: 'text', required: true, canCreate: true } }
 				};
 
 				(() => queryBuilder.insert(schema, 'not an object')).should.throw(Error);
@@ -286,8 +286,8 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'tableName',
 					columns: {
-						prop1: { type: 'number', required: true },
-						prop2: { type: 'number', required: true }
+						prop1: { type: 'number', required: true, canCreate: true },
+						prop2: { type: 'number', required: true, canCreate: true }
 					}
 				};
 
@@ -302,7 +302,7 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'tableName',
 					columns: {
-						prop1: { type: 'number', required: true }
+						prop1: { type: 'number', required: true, canCreate: true }
 					}
 				};
 
@@ -317,7 +317,7 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'table',
 					columns: {
-						prop: { type: 'number', required: true }
+						prop: { type: 'number', required: true, canCreate: true }
 					}
 				};
 
@@ -332,11 +332,26 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'table',
 					columns: {
-						prop: { type: 'integer', required: true }
+						prop: { type: 'integer', required: true, canCreate: true }
 					}
 				};
 
 				const values = { prop: 873 };
+
+				(() => queryBuilder.insert(schema, values)).should.throw(Error);
+			});
+		});
+
+		describe('when given a column that cannot be inserted', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'tbl',
+					columns: {
+						prop1: { type: 'integer', required: true, canCreate: false }
+					}
+				};
+
+				const values = { prop1: 500 };
 
 				(() => queryBuilder.insert(schema, values)).should.throw(Error);
 			});
@@ -347,10 +362,10 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'table_name',
 					columns: {
-						colA: { type: 'text', required: true },
-						colB: { type: 'number', required: false },
-						colC: { type: 'boolean', required: true },
-						colD: { type: 'json', required: false }
+						colA: { type: 'text', required: true, canCreate: true },
+						colB: { type: 'number', required: false, canCreate: true },
+						colC: { type: 'boolean', required: true, canCreate: true },
+						colD: { type: 'json', required: false, canCreate: true }
 					}
 				};
 
@@ -361,7 +376,7 @@ describe('queryBuilder', () => {
 					colD: { foo: 'bar' }
 				};
 
-				const regex = /^(?:INSERT INTO|insert into) (\S+) \(((?:\S+, )*(?:\S+))\) (?:VALUES|values) \(((?:.+, )*(?:.+))\)$/;
+				const regex = /^(?:INSERT INTO|insert into) (\S+) \(((?:\S+, )*(?:\S+))\) (?:VALUES|values) \(((?:.+, )*(?:.+))\) RETURNING \*$/;
 
 				const query = queryBuilder.insert(schema, vals);
 				const result = regex.exec(query);

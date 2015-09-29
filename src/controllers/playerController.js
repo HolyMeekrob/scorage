@@ -2,7 +2,7 @@ import koaBody from 'koa-body';
 import playerModel from '../db/models/player';
 import koaRouter from 'koa-router';
 const router = koaRouter({ prefix: '/players' });
-
+const bodyParser = koaBody();
 
 router.get('/', function* (next) {
 	this.type = 'application/json';
@@ -26,7 +26,7 @@ router.get('/:id', function* (next) {
 	yield next;
 });
 
-router.post('/players', koaBody, function* (next) {
+router.post('/', bodyParser, function* (next) {
 	this.accepts('application/json');
 
 	const newPlayer = yield playerModel.create(this.request.body);
