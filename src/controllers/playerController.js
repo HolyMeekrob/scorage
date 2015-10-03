@@ -34,4 +34,15 @@ router.post('/', bodyParser, function* (next) {
 	yield next;
 });
 
+router.put('/:id', bodyParser, function* (next) {
+	this.accepts('application/json');
+
+	const updatedPlayer = yield playerModel.update(
+		this.request.body, [['id', this.params.id]]
+	);
+	this.body = JSON.stringify(updatedPlayer);
+
+	yield next;
+});
+
 export default router;

@@ -105,10 +105,21 @@ const player = (() => {
 		return getSingle(options);
 	};
 
+	const update = (vals, conditions) => {
+		const options = optionsBuilder.build(undefined, conditions);
+		const query = queryBuilder.update(schema, vals, options);
+
+		return db.makeRequest(query)
+			.then((result) => {
+				return Promise.resolve(result.rows);
+			});
+	};
+
 	return Object.freeze({
 		create,
 		getAll,
-		getById
+		getById,
+		update
 	});
 })();
 

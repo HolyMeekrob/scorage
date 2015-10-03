@@ -1,14 +1,16 @@
-import { isNil, difference, any, intersection } from '../../util';
+import { isNil, difference, any } from '../../util';
 import {
-	isTypeMatch,
 	isTableNameValid,
-	getFormattedValue
+	getFormattedValue,
+	getMisusedColumns,
+	getInvalidColumns,
+	getTypeMismatchedColumns
 } from './queryBuilderUtil';
 
 const insertQueryBuilder = (() => {
 	const checkValuesForInsert = (schema, values) => {
-		const schemaColumns = Object.getOwnPropertyNames(schema.columns);
-		const valueColumns = Object.getOwnPropertyNames(values);
+		const schemaColumns = Object.keys(schema.columns);
+		const valueColumns = Object.keys(values);
 
 		const requiredColumns = schemaColumns.filter((col) => {
 			return schema.columns[col].required;
@@ -19,24 +21,18 @@ const insertQueryBuilder = (() => {
 			throw new Error(`Columns [${missingColumns.join(', ')}] are required`);
 		}
 
-		const cannotInsertColumns = schemaColumns.filter((col) => {
-			return !schema.columns[col].canCreate;
-		});
-
-		const extraColumns = intersection(cannotInsertColumns, valueColumns);
-		if (any(extraColumns)) {
+		const cannotInsertColumns = getMisusedColumns(schema, values, 'canCreate');
+		if (any(cannotInsertColumns)) {
 			throw new Error(
-				`Columns [${extraColumns.join(', ')}] cannot be inserted`);
+				`Columns [${cannotInsertColumns.join(', ')}] cannot be inserted`);
 		}
 
-		const invalidColumns = difference(valueColumns, schemaColumns);
+		const invalidColumns = getInvalidColumns(schema, values);
 		if (any(invalidColumns)) {
 			throw new Error(`Columns [${invalidColumns.join(', ')}] are invalid`);
 		}
 
-		const typeMismatches = valueColumns.filter((col) => {
-			return !isTypeMatch(values[col], schema.columns[col].type);
-		});
+		const typeMismatches = getTypeMismatchedColumns(schema, values);
 		if (any(typeMismatches)) {
 			throw new Error(
 				`Columns [${typeMismatches.join(', ')}] are the wrong type`);
@@ -54,7 +50,7 @@ const insertQueryBuilder = (() => {
 
 		checkValuesForInsert(schema, values);
 
-		const updateCols = Object.getOwnPropertyNames(values);
+		const updateCols = Object.keys(values);
 
 		const colVals = updateCols.reduce((arr, col) => {
 			arr.push([col, getFormattedValue(

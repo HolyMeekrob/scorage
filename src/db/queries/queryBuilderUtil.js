@@ -1,4 +1,4 @@
-import { isNil } from '../../util';
+import { isNil, difference, intersection } from '../../util';
 
 const queryBuilderUtil = (() => {
 	const isTableNameValid = (schema) => {
@@ -53,10 +53,37 @@ const queryBuilderUtil = (() => {
 		throw new Error(`${type} is not a valid type`);
 	};
 
+	const getMisusedColumns = (schema, values, flag) => {
+		const schemaColumns = Object.keys(schema.columns);
+		const valueColumns = Object.keys(values);
+
+		const cannotUseColumns = schemaColumns.filter((col) => {
+			return !schema.columns[col][flag];
+		});
+
+		return intersection(cannotUseColumns, valueColumns);
+	};
+
+	const getInvalidColumns = (schema, values) => {
+		const schemaColumns = Object.keys(schema.columns);
+		const valueColumns = Object.keys(values);
+		return difference(valueColumns, schemaColumns);
+	};
+
+	const getTypeMismatchedColumns = (schema, values) => {
+		const valueColumns = Object.keys(values);
+		return valueColumns.filter((col) => {
+			return !isTypeMatch(values[col], schema.columns[col].type);
+		});
+	};
+
 	return Object.freeze({
 		isTableNameValid,
 		isTypeMatch,
-		getFormattedValue
+		getFormattedValue,
+		getTypeMismatchedColumns,
+		getInvalidColumns,
+		getMisusedColumns
 	});
 })();
 

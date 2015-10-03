@@ -1,4 +1,11 @@
-import { isTableNameValid, isTypeMatch, getFormattedValue } from '../../../../../src/db/queries/queryBuilderUtil';
+import {
+	isTableNameValid,
+	isTypeMatch,
+	getFormattedValue,
+	getMisusedColumns,
+	getInvalidColumns,
+	getTypeMismatchedColumns
+} from '../../../../../src/db/queries/queryBuilderUtil';
 import chai from 'chai';
 chai.should();
 
@@ -154,6 +161,187 @@ describe('queryBuilderUtil', () => {
 			it('should return the stringified json object', () => {
 				const val = { prop1: 23, prop2: 'val', prop3: false };
 				getFormattedValue(val, 'json').should.equal(JSON.stringify(val));
+			});
+		});
+	});
+
+	describe('#getMisusedColumns()', () => {
+		describe('when given a nil schema', () => {
+			it('should throw an error', () => {
+				const schema = undefined;
+				const values = {
+					col: 'val'
+				};
+				const flag = 'flag';
+
+				(() => getMisusedColumns(schema, values, flag)).should.throw(Error);
+			});
+		});
+
+		describe('when given nil values', () => {
+			it('should throw an error', () => {
+				const schema = {
+					columns: { col: { flag: true } }
+				};
+				const values = null;
+				const flag = 'flag';
+
+				(() => getMisusedColumns(schema, values, flag)).should.throw(Error);
+			});
+		});
+
+		describe('when given a non-existent flag', () => {
+			it('should return all values', () => {
+				const schema = {
+					columns: { col: { flag: true } }
+				};
+				const values = { col: 'val' };
+				const flag = 'dummyValue';
+
+				const result = getMisusedColumns(schema, values, flag);
+				result.length.should.equal(1);
+				result.should.include('col');
+			});
+		});
+
+		describe('when given values that have false flags', () => {
+			it('should return those values', () => {
+				const schema = {
+					columns: { col1: { flag: true }, col2: { flag: false } }
+				};
+				const values = { col1: 'val1', col2: 'val2' };
+				const flag = 'flag';
+
+				const result = getMisusedColumns(schema, values, flag);
+				result.length.should.equal(1);
+				result.should.include('col2');
+			});
+		});
+
+		describe('when only given values that have true flags', () => {
+			it('should return an empty array', () => {
+				const schema = {
+					columns: { col1: { flag: true }, col2: { flag: true } }
+				};
+				const values = { col1: 'val1', col2: 'val2' };
+				const flag = 'flag';
+
+				getMisusedColumns(schema, values, flag).should.be.empty;
+			});
+		});
+	});
+
+	describe('#getInvalidColumns()', () => {
+		describe('when given a nil schema', () => {
+			it('should throw an error', () => {
+				const schema = null;
+				const values = { key: 'val' };
+
+				(() => getInvalidColumns(schema, values)).should.throw(Error);
+			});
+		});
+
+		describe('when given nil values', () => {
+			it('should throw an error', () => {
+				const schema = { columns: { col: {} } };
+
+				(() => getInvalidColumns(schema)).should.throw(Error);
+			});
+		});
+
+		describe('when given an invalid schema', () => {
+			it('should throw an error', () => {
+				const schema = { col: {} };
+				const values = { col: 'val' };
+
+				(() => getInvalidColumns(schema, values)).should.throw(Error);
+			});
+		});
+
+		describe('when given values that are not in the schema', () => {
+			it('should return those columns', () => {
+				const schema = {
+					columns: {
+						validCol: {}
+					}
+				};
+				const values = {
+					validCol: 1, invalidCol1: 'foo', invalidCol2: 'bar'
+				};
+
+				const result = getInvalidColumns(schema, values);
+				result.length.should.equal(2);
+				result.should.include('invalidCol1');
+				result.should.include('invalidCol2');
+			});
+		});
+
+		describe('when given only values that are in the schema', () => {
+			it('should return an empty array', () => {
+				const schema = {
+					columns: {
+						validCol1: {},
+						validCol2: {},
+						validCol3: {}
+					}
+				};
+
+				const values = {
+					validCol1: 1, validCol3: 'foo'
+				};
+
+				getInvalidColumns(schema, values).should.be.empty;
+			});
+		});
+	});
+
+	describe('#getTypeMismatchedColumns()', () => {
+		describe('when given a nil schema', () => {
+			it('should throw an error', () => {
+				const schema = undefined;
+				const values = { col: 'val' };
+
+				(() => getTypeMismatchedColumns(schema, values)).should.throw(Error);
+			});
+		});
+
+		describe('when given nil values', () => {
+			it('should throw an error', () => {
+				const schema = {
+					columns: { col: {} }
+				};
+				const values = null;
+
+				(() => getTypeMismatchedColumns(schema, values)).should.throw(Error);
+			});
+		});
+
+		describe('when given values that do not match their schema type', () => {
+			it('should return those values', () => {
+				const schema = {
+					columns: {
+						col1: { type: 'number' }, col2: { type: 'number' }, col3: { type: 'text' }
+					}
+				};
+				const values = { col1: 12, col2: 'blah', col3: true };
+
+				const result = getTypeMismatchedColumns(schema, values);
+				result.length.should.equal(2);
+				result.should.include('col2');
+				result.should.include('col3');
+			});
+		});
+
+		describe('when given values that all match their schema type', () => {
+			it('should return an empty array', () => {
+				const schema = {
+					columns: {
+						col1: { type: 'number' }, col2: { type: 'text' }, col3: { type: 'boolean' }
+					}
+				};
+				const values = { col1: 4, col2: 'val', col3: false };
+
+				getTypeMismatchedColumns(schema, values).should.be.empty;
 			});
 		});
 	});

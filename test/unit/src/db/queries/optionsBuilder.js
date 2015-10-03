@@ -7,14 +7,16 @@ describe('optionsBuilder', () => {
 		describe('when given no arguments', () => {
 			it('should have empty properties', () => {
 				const options = optionsBuilder.build();
-				options.getFields().length.should.equal(0);
-				options.getConditions().size.should.equal(0);
+				options.getFields().should.equal('*');
+				options.getConditions().should.equal('');
 			});
 		});
 
 		describe('when given fields that are not an array', () => {
-			it('should throw an error', () => {
-				(() => optionsBuilder.build('not an array')).should.throw(Error);
+			describe('and retrieving those fields', () => {
+				it('should throw an error', () => {
+					(() => optionsBuilder.build('not an array').getFields()).should.throw(Error);
+				});
 			});
 		});
 
@@ -23,27 +25,24 @@ describe('optionsBuilder', () => {
 				const fields = ['left', 'right', 'center'];
 				const options = optionsBuilder.build(fields);
 
-				options.getFields().should.deep.equal(fields);
+				options.getFields().should.deep.equal(fields.join(', '));
 			});
 		});
 
 		describe('when given conditions that are not an array', () => {
-			it('should throw an error', () => {
-				(() => optionsBuilder.build(undefined, 'not an array')).should.throw(Error);
-			});
-		});
-
-		describe('when given a condition that is not an array', () => {
-			it('should throw an error', () => {
-				const conditions = [['key', 'value'], 45];
-				(() => optionsBuilder.build(undefined, conditions)).should.throw(Error);
+			describe('and retrieving those conditions', () => {
+				it('should throw an error', () => {
+					(() => optionsBuilder.build(undefined, 'not an array').getConditions()).should.throw(Error);
+				});
 			});
 		});
 
 		describe('when given a condition that is a non-two element array', () => {
-			it('should throw an error', () => {
-				const conditions = [['key', 'value'], ['a'], ['b'], ['c']];
-				(() => optionsBuilder.build(undefined, conditions)).should.throw(Error);
+			describe('and retrieving those conditions', () => {
+				it('should throw an error', () => {
+					const conditions = [['key', 'value'], ['a'], ['b'], ['c']];
+					(() => optionsBuilder.build(undefined, conditions).getConditions()).should.throw(Error);
+				});
 			});
 		});
 
@@ -57,10 +56,21 @@ describe('optionsBuilder', () => {
 				const conditions = [[key1, val1], [key2, val2]];
 				const options = optionsBuilder.build(undefined, conditions);
 
-				const result = options.getConditions();
-				result.size.should.equal(2);
-				result.get(key1).should.equal(val1);
-				result.get(key2).should.equal(val2);
+				const regex = /^ (?:WHERE|where) (.+=.+) (?:AND|and) (.+=.+)$/;
+				const conditionStr = options.getConditions();
+				const result = regex.exec(conditionStr);
+
+				const testCondition = (clause) => {
+					return clause === `${key1} = '${val1}'`
+					|| clause === `${key2} = ${val2}`;
+				};
+
+				result.should.not.be.null;
+				const cond1 = result[1];
+				const cond2 = result[2];
+				cond1.should.not.deep.equal(cond2);
+				cond1.should.satisfy(testCondition);
+				cond2.should.satisfy(testCondition);
 			});
 		});
 
@@ -74,11 +84,36 @@ describe('optionsBuilder', () => {
 
 				const options = optionsBuilder.build(fields, conditions);
 
-				options.getFields().should.deep.equal(fields);
+				options.getFields().should.deep.equal(fields.join(', '));
 
+				const regex = /^ (?:WHERE|where) (\S+ = \S+)$/;
 				const conditionResult = options.getConditions();
-				conditionResult.size.should.equal(1);
-				conditionResult.get(key).should.equal(val);
+				const result = regex.exec(conditionResult);
+
+				result.should.not.be.null;
+				result[1].should.equal(`${key} = '${val}'`);
+			});
+		});
+
+		describe('when given conditions with multiple accepted values', () => {
+			it('should have its conditions set appropriately', () => {
+				const key = 'key';
+				const val1 = 'val1';
+				const val2 = 'val2';
+				const val3 = 'val3';
+				const vals = [val1, val2, val3];
+				const conditions = [[key, vals]];
+
+				const options = optionsBuilder.build(undefined, conditions);
+
+				const regex = /^ (?:WHERE|where) (\w+) IN \(((?:'\w+', )+)('\w+')\)$/;
+				const conditionsStr = options.getConditions();
+				const result = regex.exec(conditionsStr);
+
+				result.should.not.be.null;
+				result[1].should.equal(key);
+				result[2].should.equal(`'${val1}', '${val2}', `);
+				result[3].should.equal(`'${val3}'`);
 			});
 		});
 	});

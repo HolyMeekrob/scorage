@@ -53,21 +53,6 @@ describe('queryBuilder', () => {
 			});
 		});
 
-		describe('when given non-nil fields that is not an array', () => {
-			it('should throw an error', () => {
-				const schema = {
-					name: 'table'
-				};
-
-				const options = {
-					getFields: () => 'not an array',
-					getConditions: () => new Map()
-				};
-
-				(() => queryBuilder.select(schema, options)).should.throw(Error);
-			});
-		});
-
 		describe('when given an empty list of fields', () => {
 			it('should select all from the table', () => {
 				const schema = {
@@ -75,8 +60,8 @@ describe('queryBuilder', () => {
 				};
 
 				const options = {
-					getFields: () => [],
-					getConditions: () => new Map()
+					getFields: () => '*',
+					getConditions: () => ''
 				};
 
 				const regex = /^(?:SELECT|select) (\S+) (?:FROM|from) (\S+)$/;
@@ -97,8 +82,8 @@ describe('queryBuilder', () => {
 				};
 
 				const options = {
-					getFields: () => ['these', 'are', 'the', 'fields'],
-					getConditions: () => new Map()
+					getFields: () => 'these, are, the, fields',
+					getConditions: () => ''
 				};
 
 				const regex = /^(?:SELECT|select) ((?:\S+, )*)(\S+) (?:FROM|from) (\S+)$/;
@@ -123,11 +108,11 @@ describe('queryBuilder', () => {
 				const val = 'val';
 
 				const options = {
-					getFields: () => [],
-					getConditions: () => new Map([[key, val]])
+					getFields: () => '*',
+					getConditions: () => ` WHERE ${key} = '${val}'`
 				};
 
-				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) (?:WHERE|where) (\S+) = (\S+)$/;
+				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
 				const query = queryBuilder.select(schema, options);
 				const result = regex.exec(query);
@@ -135,7 +120,7 @@ describe('queryBuilder', () => {
 				result.should.not.be.null;
 				result[1].should.equal(schema.name);
 				result[2].should.equal(key);
-				result[3].should.equal(val);
+				result[3].should.equal(`'${val}'`);
 			});
 		});
 
@@ -149,11 +134,11 @@ describe('queryBuilder', () => {
 				const vals = ['val1', 'val2', 'val3'];
 
 				const options = {
-					getFields: () => [],
-					getConditions: () => new Map([[key, vals]])
+					getFields: () => '*',
+					getConditions: () => ` WHERE ${key} IN (${vals.join(', ') })`
 				};
 
-				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) (?:WHERE|where) (\S+) (?:IN|in) \(((?:\S+, )*\S+)\)$/;
+				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
 				const query = queryBuilder.select(schema, options);
 				const result = regex.exec(query);
@@ -177,11 +162,11 @@ describe('queryBuilder', () => {
 				const val2 = ['a', 'b', 'c', 'd'];
 
 				const options = {
-					getFields: () => [],
-					getConditions: () => new Map([[key1, val1], [key2, val2]])
+					getFields: () => '*',
+					getConditions: () => ` WHERE ${key1} = ${val1} AND ${key2} IN (${val2.join(', ') })`
 				};
 
-				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) (?:WHERE|where) (\S+) = (\S+) AND (\S+) (?:IN|in) \(((?:\S+, )*\S+)\)$/;
+				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+) AND (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
 				const query = queryBuilder.select(schema, options);
 				const result = regex.exec(query);
@@ -206,11 +191,11 @@ describe('queryBuilder', () => {
 				const val = 'theVal';
 
 				const options = {
-					getFields: () => fields,
-					getConditions: () => new Map([[key, val]])
+					getFields: () => fields.join(', '),
+					getConditions: () => ` WHERE ${key} = '${val}'`
 				};
 
-				const regex = /^(?:SELECT|select) ((?:\S+, )*\S+) (?:FROM|from) (\S+) (?:WHERE|where) (\S+) = (\S+)$/;
+				const regex = /^(?:SELECT|select) ((?:\S+, )*\S+) (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
 				const query = queryBuilder.select(schema, options);
 				const result = regex.exec(query);
@@ -219,7 +204,7 @@ describe('queryBuilder', () => {
 				result[1].should.equal(fields.join(', '));
 				result[2].should.equal(schema.name);
 				result[3].should.equal(key);
-				result[4].should.equal(val);
+				result[4].should.equal(`'${val}'`);
 			});
 		});
 	});
@@ -347,7 +332,7 @@ describe('queryBuilder', () => {
 				const schema = {
 					name: 'tbl',
 					columns: {
-						prop1: { type: 'integer', required: true, canCreate: false }
+						prop1: { type: 'number', required: true, canCreate: false }
 					}
 				};
 
@@ -394,6 +379,224 @@ describe('queryBuilder', () => {
 				queryVals.should.include(vals.colB.toString());
 				queryVals.should.include(vals.colC.toString().toUpperCase());
 				queryVals.should.include(JSON.stringify(vals.colD));
+			});
+		});
+	});
+
+	describe('#update()', () => {
+		describe('when given a nil schema', () => {
+			it('should throw an error', () => {
+				const schema = undefined;
+				const values = { key: 'val' };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a nil table name', () => {
+			it('should throw an error', () => {
+				const schema = {};
+				const values = { key: 'val' };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a tableName that is not a string', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 123
+				};
+				const values = { key: 'val' };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a nil values argument', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop: { type: 'text', required: false, canUpdate: true }
+					}
+				};
+				const values = undefined;
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a non-object values argument', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop: { type: 'text', required: false, canUpdate: true }
+					}
+				};
+				const values = 'not an object';
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given an empty values object', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop: { type: 'text', required: false, canUpdate: true }
+					}
+				};
+				const values = {};
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given non-existent columns', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'tableName',
+					columns: {
+						prop1: { type: 'number', required: true, canUpdate: true }
+					}
+				};
+
+				const values = { prop1: 3, prop2: 7 };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given mismatched types', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop: { type: 'number', required: true, canUpdate: true }
+					}
+				};
+
+				const values = { prop: 'not a number' };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when the schema has an invalid type', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop: { type: 'integer', required: true, canUpdate: true }
+					}
+				};
+
+				const values = { prop: 873 };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a column that cannot be updated', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'tbl',
+					columns: {
+						prop1: { type: 'number', required: true, canUpdate: false }
+					}
+				};
+
+				const values = { prop1: 500 };
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given valid values', () => {
+			it('should return the expected update statement', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop1: { type: 'text', required: true, canUpdate: true }
+					}
+				};
+
+				const val = 'newVal';
+				const values = { prop1: val };
+				const options = {
+					getConditions: () => ''
+				};
+
+				const regex = /^(?:UPDATE|update) (\w+) (?:SET|set) (\w+) = ('\w+') RETURNING \*$/;
+				const updateStr = queryBuilder.update(schema, values, options);
+				const result = regex.exec(updateStr);
+
+				result.should.not.be.null;
+				result[1].should.equal(schema.name);
+				result[2].should.equal('prop1');
+				result[3].should.equal(`'${val}'`);
+			});
+		});
+
+		describe('when given valid values with conditions', () => {
+			it('should return the expected update statement', () => {
+				const schema = {
+					name: 'table',
+					columns: {
+						prop1: { type: 'number', required: true, canUpdate: true }
+					}
+				};
+
+				const val = 101;
+				const values = { prop1: val };
+
+				const conditionStr = ' WHERE prop1 = 100';
+				const options = {
+					getConditions: () => conditionStr
+				};
+
+				const regex = /^(?:UPDATE|update) (\w+) (?:SET|set) (\w+) = (\w+)(.*) RETURNING \*$/;
+				const updateStr = queryBuilder.update(schema, values, options);
+				const result = regex.exec(updateStr);
+
+				result.should.not.be.null;
+				result[1].should.equal(schema.name);
+				result[2].should.equal('prop1');
+				result[3].should.equal(val.toString());
+				result[4].should.equal(conditionStr);
 			});
 		});
 	});
