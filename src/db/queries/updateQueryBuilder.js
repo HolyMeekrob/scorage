@@ -1,4 +1,5 @@
 import { isNil, any } from '../../util';
+import { getConditions } from '../subqueries/conditionsBuilder';
 import {
 	isTableNameValid,
 	getMisusedColumns,
@@ -32,7 +33,7 @@ const updateQueryBuilder = (() => {
 		}
 	};
 
-	const update = (schema, values, options) => {
+	const update = (schema, values, conditions) => {
 		if (!isTableNameValid(schema)) {
 			throw new Error('Valid table name required');
 		}
@@ -48,8 +49,10 @@ const updateQueryBuilder = (() => {
 			return `${col} = ${value}`;
 		});
 
+		const conditionsStr = getConditions(conditions);
+
 		return removeExtraWhitespace(`UPDATE ${schema.name} SET ${querySets}\
-			${options.getConditions()} RETURNING *`
+			${conditionsStr} RETURNING *`
 		);
 	};
 

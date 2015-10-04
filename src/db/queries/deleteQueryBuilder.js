@@ -1,7 +1,8 @@
+import { getConditions } from '../subqueries/conditionsBuilder';
 import { isTableNameValid } from './queryBuilderUtil';
 
 const deleteQueryBuilder = (() => {
-	const del = (schema, options) => {
+	const del = (schema, conditions) => {
 		if (!isTableNameValid(schema)) {
 			throw new Error('Valid table name required');
 		}
@@ -10,7 +11,9 @@ const deleteQueryBuilder = (() => {
 			throw new Error(`Table ${schema.name} does not allow deletes`);
 		}
 
-		return `DELETE FROM ${schema.name}${options.getConditions()} RETURNING *`;
+		const conditionsStr = getConditions(conditions);
+
+		return `DELETE FROM ${schema.name}${conditionsStr} RETURNING *`;
 	};
 
 	return Object.freeze({

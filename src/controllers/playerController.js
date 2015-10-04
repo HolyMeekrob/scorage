@@ -8,7 +8,7 @@ const bodyParser = koaBody();
 router.get('/', function* (next) {
 	this.type = 'application/json';
 
-	yield playerModel.getAll()
+	yield playerModel.get()
 		.then((players) => {
 			this.body = players;
 		});

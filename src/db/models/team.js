@@ -1,7 +1,7 @@
 import baseModel from './baseModel';
 import player from './player';
 import roster from './rosterSpot';
-import optionsBuilder from '../queries/optionsBuilder';
+import { getConditions } from '../subqueries/conditionsBuilder';
 import { removeExtraWhitespace } from '../queries/queryBuilderUtil';
 
 const team = (() => {
@@ -65,24 +65,22 @@ const team = (() => {
 	const getRoster = (teamId) => {
 		const playerTable = player.getTableName();
 		const rosterTable = roster.getTableName();
-		const options = optionsBuilder.build(
-			undefined, [[`${rosterTable}.team_id`, teamId]]);
+		const conditions = getConditions(
+			[[`${rosterTable}.team_id`, teamId]]);
 		const query = removeExtraWhitespace(
 			`SELECT ${playerTable}.* FROM ${playerTable} \
 			INNER JOIN ${rosterTable} ON ${playerTable}.id = ${rosterTable}.player_id\
-			${options.getConditions()}`
+			${conditions}`
 		);
 
 		return base.runQuery(query);
 	};
 
 	const addPlayer = (teamId, playerId) => {
-		return roster.create(
-			{
-				team_id: teamId,
-				player_id: playerId,
-			}
-		).then(() => {
+		return roster.create({
+			team_id: teamId,
+			player_id: playerId,
+		}).then(() => {
 			return Promise.resolve(getRoster(teamId));
 		});
 	};
@@ -97,7 +95,7 @@ const team = (() => {
 	return Object.freeze({
 		getTableName: base.getTableName,
 		create: base.create,
-		getAll: base.getAll,
+		get: base.get,
 		getById: base.getById,
 		getRoster,
 		update: base.update,

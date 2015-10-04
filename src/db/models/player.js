@@ -73,7 +73,7 @@ const player = (() => {
 	return Object.freeze({
 		getTableName: base.getTableName,
 		create: base.create,
-		getAll: base.getAll,
+		get: base.get,
 		getById: base.getById,
 		update: base.update,
 		updateById: base.updateById

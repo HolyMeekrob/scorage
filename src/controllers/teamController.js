@@ -8,7 +8,7 @@ const bodyParser = koaBody();
 router.get('/', function* (next) {
 	this.type = 'application/json';
 
-	yield teamModel.getAll()
+	yield teamModel.get()
 		.then((teams) => {
 			this.body = teams;
 		});

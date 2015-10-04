@@ -26,7 +26,7 @@ describe('queryBuilder', () => {
 			});
 		});
 
-		describe('when given a non-nil non-object options argument', () => {
+		describe('when given a non-nil non-array fields argument', () => {
 			it('should throw an error', () => {
 				const schema = {
 					name: 'tableName'
@@ -36,7 +36,7 @@ describe('queryBuilder', () => {
 			});
 		});
 
-		describe('when given a nil options argument', () => {
+		describe('when given a nil fields argument', () => {
 			it('should select all from the table', () => {
 				const schema = {
 					name: 'theTable'
@@ -59,14 +59,11 @@ describe('queryBuilder', () => {
 					name: 'theTable'
 				};
 
-				const options = {
-					getFields: () => '*',
-					getConditions: () => ''
-				};
+				const fields = [];
 
 				const regex = /^(?:SELECT|select) (\S+) (?:FROM|from) (\S+)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -81,14 +78,11 @@ describe('queryBuilder', () => {
 					name: 'tableWithFields'
 				};
 
-				const options = {
-					getFields: () => 'these, are, the, fields',
-					getConditions: () => ''
-				};
+				const fields = ['these', 'are', 'the', 'fields']
 
 				const regex = /^(?:SELECT|select) ((?:\S+, )*)(\S+) (?:FROM|from) (\S+)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -107,14 +101,12 @@ describe('queryBuilder', () => {
 				const key = 'key';
 				const val = 'val';
 
-				const options = {
-					getFields: () => '*',
-					getConditions: () => ` WHERE ${key} = '${val}'`
-				};
+				const fields = undefined;
+				const conditions = [[key, val]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -133,20 +125,18 @@ describe('queryBuilder', () => {
 				const key = 'key';
 				const vals = ['val1', 'val2', 'val3'];
 
-				const options = {
-					getFields: () => '*',
-					getConditions: () => ` WHERE ${key} IN (${vals.join(', ') })`
-				};
+				const fields = undefined;
+				const conditions = [[key, vals]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
 				result[1].should.equal(schema.name);
 				result[2].should.equal(key);
-				result[3].should.equal(vals.join(', '));
+				result[3].should.equal(`'${vals[0]}', '${vals[1]}', '${vals[2]}'`);
 			});
 		});
 
@@ -159,22 +149,20 @@ describe('queryBuilder', () => {
 				const key1 = 'key1';
 				const key2 = 'key2';
 				const val1 = 'val1';
-				const val2 = ['a', 'b', 'c', 'd'];
+				const val2 = [1, 2, 3, 4];
 
-				const options = {
-					getFields: () => '*',
-					getConditions: () => ` WHERE ${key1} = ${val1} AND ${key2} IN (${val2.join(', ') })`
-				};
+				const fields = undefined;
+				const conditions = [[key1, val1], [key2, val2]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+) AND (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
 				result[1].should.equal(schema.name);
 				result[2].should.equal(key1);
-				result[3].should.equal(val1);
+				result[3].should.equal(`'${val1}'`);
 				result[4].should.equal(key2);
 				result[5].should.equal(val2.join(', '));
 			});
@@ -190,14 +178,11 @@ describe('queryBuilder', () => {
 				const key = 'theKey';
 				const val = 'theVal';
 
-				const options = {
-					getFields: () => fields.join(', '),
-					getConditions: () => ` WHERE ${key} = '${val}'`
-				};
+				const conditions = [[key, val]];
 
 				const regex = /^(?:SELECT|select) ((?:\S+, )*\S+) (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
-				const query = queryBuilder.select(schema, options);
+				const query = queryBuilder.select(schema, fields, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -388,11 +373,9 @@ describe('queryBuilder', () => {
 			it('should throw an error', () => {
 				const schema = undefined;
 				const values = { key: 'val' };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -400,11 +383,9 @@ describe('queryBuilder', () => {
 			it('should throw an error', () => {
 				const schema = {};
 				const values = { key: 'val' };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -414,11 +395,9 @@ describe('queryBuilder', () => {
 					name: 123
 				};
 				const values = { key: 'val' };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -431,11 +410,9 @@ describe('queryBuilder', () => {
 					}
 				};
 				const values = undefined;
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -448,11 +425,9 @@ describe('queryBuilder', () => {
 					}
 				};
 				const values = 'not an object';
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -465,11 +440,9 @@ describe('queryBuilder', () => {
 					}
 				};
 				const values = {};
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -483,11 +456,9 @@ describe('queryBuilder', () => {
 				};
 
 				const values = { prop1: 3, prop2: 7 };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -501,11 +472,9 @@ describe('queryBuilder', () => {
 				};
 
 				const values = { prop: 'not a number' };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -519,11 +488,9 @@ describe('queryBuilder', () => {
 				};
 
 				const values = { prop: 873 };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -537,11 +504,9 @@ describe('queryBuilder', () => {
 				};
 
 				const values = { prop1: 500 };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.update(schema, values, options)).should.throw(Error);
+				(() => queryBuilder.update(schema, values, conditions)).should.throw(Error);
 			});
 		});
 
@@ -556,12 +521,10 @@ describe('queryBuilder', () => {
 
 				const val = 'newVal';
 				const values = { prop1: val };
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = undefined;
 
 				const regex = /^(?:UPDATE|update) (\w+) (?:SET|set) (\w+) = ('\w+') RETURNING \*$/;
-				const updateStr = queryBuilder.update(schema, values, options);
+				const updateStr = queryBuilder.update(schema, values, conditions);
 				const result = regex.exec(updateStr);
 
 				result.should.not.be.null;
@@ -582,21 +545,21 @@ describe('queryBuilder', () => {
 
 				const val = 101;
 				const values = { prop1: val };
+				const key = 'prop1';
+				const conditionVal = 100;
 
-				const conditionStr = ' WHERE prop1 = 100';
-				const options = {
-					getConditions: () => conditionStr
-				};
+				const conditions = [[key, conditionVal]];
 
-				const regex = /^(?:UPDATE|update) (\w+) (?:SET|set) (\w+) = (\w+)(.*) RETURNING \*$/;
-				const updateStr = queryBuilder.update(schema, values, options);
+				const regex = /^(?:UPDATE|update) (\w+) (?:SET|set) (\w+) = (\w+) (?:WHERE|where) (\w+) = (\w+) RETURNING \*$/;
+				const updateStr = queryBuilder.update(schema, values, conditions);
 				const result = regex.exec(updateStr);
 
 				result.should.not.be.null;
 				result[1].should.equal(schema.name);
-				result[2].should.equal('prop1');
-				result[3].should.equal(val.toString());
-				result[4].should.equal(conditionStr);
+				result[2].should.equal(key);
+				result[3].should.equal(val.toString(10));
+				result[4].should.equal(key);
+				result[5].should.equal(conditionVal.toString(10));
 			});
 		});
 	});
@@ -605,11 +568,9 @@ describe('queryBuilder', () => {
 		describe('when given a nil schema', () => {
 			it('should throw an error', () => {
 				const schema = undefined;
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
-				(() => queryBuilder.del(schema, options)).should.throw(Error);
+				(() => queryBuilder.del(schema, conditions)).should.throw(Error);
 			});
 		});
 
@@ -618,11 +579,9 @@ describe('queryBuilder', () => {
 				const schema = {
 					canDelete: true
 				};
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = undefined;
 
-				(() => queryBuilder.del(schema, options)).should.throw(Error);
+				(() => queryBuilder.del(schema, conditions)).should.throw(Error);
 			});
 		});
 
@@ -632,11 +591,9 @@ describe('queryBuilder', () => {
 					name: 123,
 					canDelete: true
 				};
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = undefined;
 
-				(() => queryBuilder.del(schema, options)).should.throw(Error);
+				(() => queryBuilder.del(schema, conditions)).should.throw(Error);
 			});
 		});
 
@@ -646,11 +603,8 @@ describe('queryBuilder', () => {
 					name: 'table',
 					canDelete: false
 				};
-				const options = {
-					getConditions: () => ''
-				};
-
-				(() => queryBuilder.del(schema, options)).should.throw(Error);
+				const conditions = [];
+				(() => queryBuilder.del(schema, conditions)).should.throw(Error);
 			});
 		});
 
@@ -660,12 +614,10 @@ describe('queryBuilder', () => {
 					name: 'table',
 					canDelete: true
 				};
-				const options = {
-					getConditions: () => ''
-				};
+				const conditions = [];
 
 				const regex = /^(?:DELETE|delete) (?:FROM|from) (\w+) (?:RETURNING|returning) \*$/;
-				const query = queryBuilder.del(schema, options);
+				const query = queryBuilder.del(schema, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -675,25 +627,24 @@ describe('queryBuilder', () => {
 
 		describe('when given a valid table name with conditions', () => {
 			it('should return the expected delete statement', () => {
+				const key = 'key';
 				const val = 'value';
 				const schema = {
 					name: 'table',
 					canDelete: true,
 					columns: {
-						key: val
+						key: {}
 					}
 				};
-				const options = {
-					getConditions: () => ` WHERE key = '${val}'`
-				};
+				const conditions = [[key, val]];
 
 				const regex = /^(?:DELETE|delete) (?:FROM|from) (\w+) (?:WHERE|where) (\w+) = '(\w+)' (?:RETURNING|returning) \*$/;
-				const query = queryBuilder.del(schema, options);
+				const query = queryBuilder.del(schema, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
 				result[1].should.equal(schema.name);
-				result[2].should.equal('key');
+				result[2].should.equal(key);
 				result[3].should.equal(val);
 			});
 		});

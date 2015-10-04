@@ -21,14 +21,14 @@ const fieldsBuilder = (() => {
 		return fields.join(', ');
 	};
 
-	const build = (fields) => {
+	const getFields = (fields) => {
 		checkFields(fields);
 		const fieldArray = [].concat(fields).filter((field) => !isNil(field));
 		return getFieldsString(fieldArray);
 	};
 
 	return Object.freeze({
-		build
+		getFields
 	});
 })();
 

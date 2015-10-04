@@ -1,5 +1,4 @@
 import baseModel from './baseModel';
-import optionsBuilder from '../queries/optionsBuilder';
 
 const rosterSpot = (() => {
 	const schema = {
@@ -23,29 +22,13 @@ const rosterSpot = (() => {
 
 	const base = baseModel(schema);
 
-	const getByTeam = (teamId) => {
-		const options = optionsBuilder.build(undefined, [['team_id', teamId]]);
-		return base.get(options);
-	};
-
-	const getByPlayer = (playerId) => {
-		const options = optionsBuilder.build(undefined, [['player_id', playerId]]);
-		return base.get(options);
-	};
-
 	const removePlayerFromTeam = (teamId, playerId) => {
-		const options = optionsBuilder.build(
-			undefined, [['team_id', teamId], ['player_id', playerId]]
-		);
-		return base.del(options);
+		return base.del([['team_id', teamId], ['player_id', playerId]]);
 	};
 
 	return Object.freeze({
 		getTableName: base.getTableName,
 		create: base.create,
-		getByTeam,
-		getByPlayer,
-		getAll: base.getAll,
 		removePlayerFromTeam
 	});
 })();

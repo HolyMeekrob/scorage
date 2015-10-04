@@ -45,13 +45,13 @@ const conditionsBuilder = (() => {
 		return ` WHERE ${clauses.join(' AND ') }`;
 	};
 
-	const build = (conditions) => {
+	const getConditions = (conditions) => {
 		checkConditions(conditions);
 		return getConditionsString(conditions);
 	};
 
 	return Object.freeze({
-		build
+		getConditions
 	});
 })();
 
