@@ -27,6 +27,7 @@ const rosterSpot = (() => {
 	};
 
 	return Object.freeze({
+		getSchema: base.getSchema,
 		getTableName: base.getTableName,
 		create: base.create,
 		removePlayerFromTeam

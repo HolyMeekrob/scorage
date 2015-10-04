@@ -71,6 +71,7 @@ const player = (() => {
 	const base = baseModel(schema);
 
 	return Object.freeze({
+		getSchema: base.getSchema,
 		getTableName: base.getTableName,
 		create: base.create,
 		get: base.get,

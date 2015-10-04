@@ -1,8 +1,9 @@
 import baseModel from './baseModel';
 import player from './player';
 import roster from './rosterSpot';
-import { getConditions } from '../subqueries/conditionsBuilder';
-import { removeExtraWhitespace } from '../queries/queryBuilderUtil';
+// import { getConditions } from '../subqueries/conditionsBuilder';
+// import { removeExtraWhitespace } from '../queries/queryBuilderUtil';
+import { selectJoin } from '../queries/selectQueryBuilder';
 
 const team = (() => {
 	const schema = {
@@ -62,18 +63,26 @@ const team = (() => {
 
 	const base = baseModel(schema);
 
-	const getRoster = (teamId) => {
-		const playerTable = player.getTableName();
-		const rosterTable = roster.getTableName();
-		const conditions = getConditions(
-			[[`${rosterTable}.team_id`, teamId]]);
-		const query = removeExtraWhitespace(
-			`SELECT ${playerTable}.* FROM ${playerTable} \
-			INNER JOIN ${rosterTable} ON ${playerTable}.id = ${rosterTable}.player_id\
-			${conditions}`
-		);
+// 	const getRoster = (teamId) => {
+// 		const playerTable = player.getTableName();
+// 		const rosterTable = roster.getTableName();
+// 		const conditions = getConditions(
+// 			[[`${rosterTable}.team_id`, teamId]]);
+// 		const query = removeExtraWhitespace(
+// 			`SELECT ${playerTable}.* FROM ${playerTable} \
+// 			INNER JOIN ${rosterTable} ON ${playerTable}.id = ${rosterTable}.player_id\
+// 			${conditions}`
+// 		);
+//
+// 		return base.runQuery(query);
+// 	};
 
-		return base.runQuery(query);
+	const getRoster = (teamId) => {
+		return base.runQuery(selectJoin(
+			[player.getSchema(), roster.getSchema()],
+			undefined,
+			[['id', 'player_id']],
+			[[`${roster.getTableName()}.team_id`, teamId]]));
 	};
 
 	const addPlayer = (teamId, playerId) => {
@@ -93,6 +102,7 @@ const team = (() => {
 	};
 
 	return Object.freeze({
+		getSchema: base.getSchema,
 		getTableName: base.getTableName,
 		create: base.create,
 		get: base.get,

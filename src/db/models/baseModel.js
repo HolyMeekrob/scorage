@@ -13,6 +13,10 @@ const baseModel = (schema) => {
 		return schema.name;
 	};
 
+	const getSchema = () => {
+		return Object.freeze(schema);
+	};
+
 	const runQuery = (query) => {
 		return db.makeRequest(query)
 			.then((result) => {
@@ -49,6 +53,7 @@ const baseModel = (schema) => {
 	};
 
 	return Object.freeze({
+		getSchema,
 		getTableName,
 		create,
 		del,
