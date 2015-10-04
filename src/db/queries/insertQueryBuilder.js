@@ -4,7 +4,8 @@ import {
 	getFormattedValue,
 	getMisusedColumns,
 	getInvalidColumns,
-	getTypeMismatchedColumns
+	getTypeMismatchedColumns,
+	removeExtraWhitespace
 } from './queryBuilderUtil';
 
 const insertQueryBuilder = (() => {
@@ -61,10 +62,10 @@ const insertQueryBuilder = (() => {
 		const queryCols = colVals.map((both) => both[0]).join(', ');
 		const queryVals = colVals.map((both) => both[1]).join(', ');
 
-		return `INSERT INTO ${schema.name} (${queryCols}) VALUES (${queryVals}) \
+		return removeExtraWhitespace(
+			`INSERT INTO ${schema.name} (${queryCols}) VALUES (${queryVals}) \
 			RETURNING *`
-			.trim()
-			.replace(/\t/g, '');
+		);
 	};
 
 	return Object.freeze({

@@ -1,11 +1,9 @@
-import db from '../client';
-import optionsBuilder from '../queries/optionsBuilder';
-import queryBuilder from '../queries/queryBuilder';
-import { single } from '../../util';
+import baseModel from './baseModel';
 
 const player = (() => {
 	const schema = {
 		name: 'player',
+		canDelete: false,
 		columns: {
 			id: {
 				type: 'number',
@@ -70,56 +68,15 @@ const player = (() => {
 		}
 	};
 
-	const create = (vals) => {
-		const query = queryBuilder.insert(schema, vals);
-
-		return db.makeRequest(query)
-			.then((result) => {
-				return Promise.resolve(single(result.rows));
-			});
-	};
-
-	const get = (options) => {
-		const query = queryBuilder.select(schema, options);
-
-		return db.makeRequest(query)
-			.then((result) => {
-				return Promise.resolve(result.rows);
-			});
-	};
-
-	const getSingle = (options) => {
-		return get(options)
-			.then((rows) => {
-				return Promise.resolve(single(rows));
-			});
-	};
-
-	const getAll = (fields) => {
-		const options = optionsBuilder.build(fields);
-		return get(options);
-	};
-
-	const getById = (id, fields) => {
-		const options = optionsBuilder.build(fields, [['id', id]]);
-		return getSingle(options);
-	};
-
-	const update = (vals, conditions) => {
-		const options = optionsBuilder.build(undefined, conditions);
-		const query = queryBuilder.update(schema, vals, options);
-
-		return db.makeRequest(query)
-			.then((result) => {
-				return Promise.resolve(result.rows);
-			});
-	};
+	const base = baseModel(schema);
 
 	return Object.freeze({
-		create,
-		getAll,
-		getById,
-		update
+		getTableName: base.getTableName,
+		create: base.create,
+		getAll: base.getAll,
+		getById: base.getById,
+		update: base.update,
+		updateById: base.updateById
 	});
 })();
 

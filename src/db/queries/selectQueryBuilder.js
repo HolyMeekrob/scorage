@@ -1,5 +1,5 @@
 import optionsBuilder from './optionsBuilder';
-import { isTableNameValid } from './queryBuilderUtil';
+import { isTableNameValid, removeExtraWhitespace } from './queryBuilderUtil';
 import { isNil } from '../../util';
 
 const selectQueryBuilder = (() => {
@@ -16,11 +16,11 @@ const selectQueryBuilder = (() => {
 			options = optionsBuilder.build();
 		}
 
-		return `SELECT ${options.getFields()} \
+		return removeExtraWhitespace(
+			`SELECT ${options.getFields()} \
 			FROM ${schema.name}\
 			${options.getConditions()}`
-			.trim()
-			.replace(/\t/g, '');
+		);
 	};
 
 	return Object.freeze({

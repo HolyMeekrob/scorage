@@ -1,9 +1,10 @@
-import koaBody from 'koa-body';
 import playerModel from '../db/models/player';
+import koaBody from 'koa-body';
 import koaRouter from 'koa-router';
 const router = koaRouter({ prefix: '/players' });
 const bodyParser = koaBody();
 
+// Get all players
 router.get('/', function* (next) {
 	this.type = 'application/json';
 
@@ -15,10 +16,11 @@ router.get('/', function* (next) {
 	yield next;
 });
 
+// Get player
 router.get('/:id', function* (next) {
 	this.type = 'application/json';
 
-	yield playerModel.getById(this.params.id)
+	yield playerModel.getById(parseInt(this.params.id, 10))
 		.then((player) => {
 			this.body = player;
 		});
@@ -26,21 +28,24 @@ router.get('/:id', function* (next) {
 	yield next;
 });
 
+// Create player
 router.post('/', bodyParser, function* (next) {
 	this.accepts('application/json');
+	this.type = 'application/json';
 
 	const newPlayer = yield playerModel.create(this.request.body);
-	this.body = JSON.stringify(newPlayer);
+	this.body = newPlayer;
 	yield next;
 });
 
+// Update player
 router.put('/:id', bodyParser, function* (next) {
 	this.accepts('application/json');
+	this.type = 'application/json';
 
-	const updatedPlayer = yield playerModel.update(
-		this.request.body, [['id', this.params.id]]
-	);
-	this.body = JSON.stringify(updatedPlayer);
+	const updatedPlayer = yield playerModel.updateById(
+		parseInt(this.params.id, 10), this.request.body);
+	this.body = updatedPlayer;
 
 	yield next;
 });

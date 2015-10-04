@@ -4,7 +4,8 @@ import {
 	getFormattedValue,
 	getMisusedColumns,
 	getInvalidColumns,
-	getTypeMismatchedColumns
+	getTypeMismatchedColumns,
+	removeExtraWhitespace
 } from '../../../../../src/db/queries/queryBuilderUtil';
 import chai from 'chai';
 chai.should();
@@ -342,6 +343,30 @@ describe('queryBuilderUtil', () => {
 				const values = { col1: 4, col2: 'val', col3: false };
 
 				getTypeMismatchedColumns(schema, values).should.be.empty;
+			});
+		});
+	});
+
+	describe('#removeExtraWhitespace()', () => {
+		describe('when given nil', () => {
+			it('should throw an error', () => {
+				(() => removeExtraWhitespace()).should.throw(Error);
+			});
+		});
+
+		describe('when given a non-string', () => {
+			it('should throw an error', () => {
+				(() => removeExtraWhitespace()).should.throw(Error);
+			});
+		});
+
+		describe('when given a string', () => {
+			it('should trim spaces and remove all tabs', () => {
+				const expected = 'this is    the  text';
+				const str = `  \
+				${expected}          `;
+
+				removeExtraWhitespace(str).should.equal(expected);
 			});
 		});
 	});

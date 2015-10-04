@@ -77,13 +77,18 @@ const queryBuilderUtil = (() => {
 		});
 	};
 
+	const removeExtraWhitespace = (query) => {
+		return query.trim().replace(/\t/g, '');
+	};
+
 	return Object.freeze({
 		isTableNameValid,
 		isTypeMatch,
 		getFormattedValue,
 		getTypeMismatchedColumns,
 		getInvalidColumns,
-		getMisusedColumns
+		getMisusedColumns,
+		removeExtraWhitespace
 	});
 })();
 

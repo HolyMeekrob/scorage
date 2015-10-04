@@ -4,7 +4,8 @@ import {
 	getMisusedColumns,
 	getInvalidColumns,
 	getTypeMismatchedColumns,
-	getFormattedValue
+	getFormattedValue,
+	removeExtraWhitespace
 } from './queryBuilderUtil';
 
 const updateQueryBuilder = (() => {
@@ -47,10 +48,9 @@ const updateQueryBuilder = (() => {
 			return `${col} = ${value}`;
 		});
 
-		return `UPDATE ${schema.name} SET ${querySets}\
+		return removeExtraWhitespace(`UPDATE ${schema.name} SET ${querySets}\
 			${options.getConditions()} RETURNING *`
-			.trim()
-			.replace(/\t/g, '');
+		);
 	};
 
 	return Object.freeze({

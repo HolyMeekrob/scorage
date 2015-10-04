@@ -600,4 +600,102 @@ describe('queryBuilder', () => {
 			});
 		});
 	});
+
+	describe('#del()', () => {
+		describe('when given a nil schema', () => {
+			it('should throw an error', () => {
+				const schema = undefined;
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.del(schema, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a nil table name', () => {
+			it('should throw an error', () => {
+				const schema = {
+					canDelete: true
+				};
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.del(schema, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a tableName that is not a string', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 123,
+					canDelete: true
+				};
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.del(schema, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a table that cannot be deleted', () => {
+			it('should throw an error', () => {
+				const schema = {
+					name: 'table',
+					canDelete: false
+				};
+				const options = {
+					getConditions: () => ''
+				};
+
+				(() => queryBuilder.del(schema, options)).should.throw(Error);
+			});
+		});
+
+		describe('when given a valid table name without conditions', () => {
+			it('should return the expected delete statement', () => {
+				const schema = {
+					name: 'table',
+					canDelete: true
+				};
+				const options = {
+					getConditions: () => ''
+				};
+
+				const regex = /^(?:DELETE|delete) (?:FROM|from) (\w+) (?:RETURNING|returning) \*$/;
+				const query = queryBuilder.del(schema, options);
+				const result = regex.exec(query);
+
+				result.should.not.be.null;
+				result[1].should.equal(schema.name);
+			});
+		});
+
+		describe('when given a valid table name with conditions', () => {
+			it('should return the expected delete statement', () => {
+				const val = 'value';
+				const schema = {
+					name: 'table',
+					canDelete: true,
+					columns: {
+						key: val
+					}
+				};
+				const options = {
+					getConditions: () => ` WHERE key = '${val}'`
+				};
+
+				const regex = /^(?:DELETE|delete) (?:FROM|from) (\w+) (?:WHERE|where) (\w+) = '(\w+)' (?:RETURNING|returning) \*$/;
+				const query = queryBuilder.del(schema, options);
+				const result = regex.exec(query);
+
+				result.should.not.be.null;
+				result[1].should.equal(schema.name);
+				result[2].should.equal('key');
+				result[3].should.equal(val);
+			});
+		});
+	});
 });
