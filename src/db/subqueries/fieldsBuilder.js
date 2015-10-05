@@ -7,7 +7,7 @@ const fieldsBuilder = (() => {
 		}
 
 		if (!Array.isArray(fieldsToCheck)) {
-			throw new Error('Query fields must be an array');
+			throw new Error('Query fields must be a string or an array');
 		}
 
 		return true;
@@ -22,6 +22,10 @@ const fieldsBuilder = (() => {
 	};
 
 	const getFields = (fields) => {
+		if (typeof fields === 'string') {
+			return fields;
+		}
+
 		checkFields(fields);
 		const fieldArray = [].concat(fields).filter((field) => !isNil(field));
 		return getFieldsString(fieldArray);

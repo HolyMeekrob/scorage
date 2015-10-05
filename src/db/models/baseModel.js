@@ -37,11 +37,15 @@ const baseModel = (schema) => {
 	};
 
 	const get = (fields, conditions) => {
-		return runQuery(queryBuilder.select(schema, fields, conditions));
+		return runQuery(queryBuilder.select(schema, fields, [], conditions));
 	};
 
 	const getById = (id, fields) => {
 		return makeSingle(get(fields, [['id', id]]));
+	};
+
+	const getComplex = (schemas, fields, joins, conditions) => {
+		return runQuery(queryBuilder.select(schemas, fields, joins, conditions));
 	};
 
 	const update = (vals, conditions) => {
@@ -60,6 +64,7 @@ const baseModel = (schema) => {
 		deleteById,
 		get,
 		getById,
+		getComplex,
 		runQuery,
 		update,
 		updateById

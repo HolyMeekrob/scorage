@@ -78,7 +78,7 @@ describe('queryBuilder', () => {
 					name: 'tableWithFields'
 				};
 
-				const fields = ['these', 'are', 'the', 'fields']
+				const fields = ['these', 'are', 'the', 'fields'];
 
 				const regex = /^(?:SELECT|select) ((?:\S+, )*)(\S+) (?:FROM|from) (\S+)$/;
 

@@ -5,18 +5,8 @@ import { isTableNameValid } from './queryBuilderUtil';
 import { any } from '../../util';
 
 const selectQueryBuilder = (() => {
-	const select = (schema, fields, conditions) => {
-		if (!isTableNameValid(schema)) {
-			throw new Error('Valid table name required');
-		}
-
-		const fieldsStr = getFields(fields);
-		const conditionsStr = getConditions(conditions);
-
-		return `SELECT ${fieldsStr} FROM ${schema.name}${conditionsStr}`;
-	};
-
-	const selectJoin = (schemas, fields, joins, conditions) => {
+	const select = (schemas, fields, joins, conditions) => {
+		schemas = Array.isArray(schemas) ? schemas : [schemas];
 		const invalidTables = schemas.filter((schema) => {
 			return !isTableNameValid(schema);
 		}).map((schema) => schema.name);
@@ -32,8 +22,7 @@ const selectQueryBuilder = (() => {
 	};
 
 	return Object.freeze({
-		select,
-		selectJoin
+		select
 	});
 })();
 

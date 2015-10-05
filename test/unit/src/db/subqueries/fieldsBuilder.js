@@ -10,11 +10,16 @@ describe('fieldsBuilder', () => {
 			});
 		});
 
-		describe('when given fields that are not an array', () => {
-			describe('and retrieving those fields', () => {
-				it('should throw an error', () => {
-					(() => getFields('not an array')).should.throw(Error);
-				});
+		describe('when given fields that are not a string or array', () => {
+			it('should throw an error', () => {
+				(() => getFields(123)).should.throw(Error);
+			});
+		});
+
+		describe('when given fields that are a string', () => {
+			it('should return the string', () => {
+				const fields = 'this, that, the, other';
+				getFields(fields).should.equal(fields);
 			});
 		});
 
@@ -22,7 +27,7 @@ describe('fieldsBuilder', () => {
 			it('should have the fields in correct format', () => {
 				const fields = ['left', 'right', 'center'];
 
-				getFields(fields).should.deep.equal(fields.join(', '));
+				getFields(fields).should.equal(fields.join(', '));
 			});
 		});
 	});
