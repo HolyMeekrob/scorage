@@ -102,11 +102,12 @@ describe('queryBuilder', () => {
 				const val = 'val';
 
 				const fields = undefined;
+				const joins = undefined;
 				const conditions = [[key, val]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
-				const query = queryBuilder.select(schema, fields, conditions);
+				const query = queryBuilder.select(schema, fields, joins, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -126,11 +127,12 @@ describe('queryBuilder', () => {
 				const vals = ['val1', 'val2', 'val3'];
 
 				const fields = undefined;
+				const joins = undefined;
 				const conditions = [[key, vals]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
-				const query = queryBuilder.select(schema, fields, conditions);
+				const query = queryBuilder.select(schema, fields, joins, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -152,11 +154,12 @@ describe('queryBuilder', () => {
 				const val2 = [1, 2, 3, 4];
 
 				const fields = undefined;
+				const joins = undefined;
 				const conditions = [[key1, val1], [key2, val2]];
 
 				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\S+) WHERE (\S+) = (\S+) AND (\S+) IN \(((?:\S+, )*\S+)\)$/;
 
-				const query = queryBuilder.select(schema, fields, conditions);
+				const query = queryBuilder.select(schema, fields, joins, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
@@ -175,6 +178,8 @@ describe('queryBuilder', () => {
 				};
 
 				const fields = ['alpha', 'beta', 'gamma'];
+				const joins = undefined;
+
 				const key = 'theKey';
 				const val = 'theVal';
 
@@ -182,7 +187,7 @@ describe('queryBuilder', () => {
 
 				const regex = /^(?:SELECT|select) ((?:\S+, )*\S+) (?:FROM|from) (\S+) WHERE (\S+) = (\S+)$/;
 
-				const query = queryBuilder.select(schema, fields, conditions);
+				const query = queryBuilder.select(schema, fields, joins, conditions);
 				const result = regex.exec(query);
 
 				result.should.not.be.null;
