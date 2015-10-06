@@ -197,6 +197,29 @@ describe('queryBuilder', () => {
 				result[4].should.equal(`'${val}'`);
 			});
 		});
+
+		describe('when given joins', () => {
+			it('should select the fields using the joins', () => {
+				const schemas = [
+					{ name: 'table1', columns: { 'col1': {} } },
+					{ name: 'table2', columns: { 'col2': {} } }
+				];
+
+				const fields = undefined;
+				const joins = [['col1', 'col2']];
+				const conditions = undefined;
+
+				const regex = /^(?:SELECT|select) \* (?:FROM|from) (\w+) INNER JOIN (\w+) ON \1\.(\w+) = \2\.(\w+)$/;
+				const query = queryBuilder.select(schemas, fields, joins, conditions);
+				const result = regex.exec(query);
+
+				result.should.not.be.null;
+				result[1].should.equal(schemas[0].name);
+				result[2].should.equal(schemas[1].name);
+				result[3].should.equal(joins[0][0]);
+				result[4].should.equal(joins[0][1]);
+			});
+		});
 	});
 
 	describe('#insert()', () => {
