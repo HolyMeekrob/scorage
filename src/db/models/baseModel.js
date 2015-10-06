@@ -3,6 +3,9 @@ import queryBuilder from '../queries/queryBuilder';
 import { single } from '../../util';
 
 const baseModel = (schema) => {
+	// Deep copy schema
+	schema = Object.freeze(JSON.parse(JSON.stringify(schema)));
+
 	const makeSingle = (promise) => {
 		return promise.then((rows) => {
 			return Promise.resolve(single(rows));
