@@ -19,4 +19,12 @@ router.post('/', bodyParser, base.setJsonType, base.createNew);
 // Update league
 router.put('/:id', bodyParser, base.setJsonType, base.updateById);
 
+// Get seasons
+router.get('/:id/seasons', base.setJsonType, function* (next) {
+	const seasons = yield leagueModel.getSeasons(parseInt(this.params.id, 10));
+	this.body = seasons;
+
+	yield next;
+});
+
 export default router;

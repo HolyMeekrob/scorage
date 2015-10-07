@@ -1,4 +1,5 @@
 import baseModel from './baseModel';
+import season from './season';
 import { deepFreeze } from '../../util';
 
 const league = (() => {
@@ -59,12 +60,17 @@ const league = (() => {
 
 	const base = baseModel(schema);
 
+	const getSeasons = (leagueId) => {
+		return season.get(undefined, [['league_id', leagueId]]);
+	};
+
 	return Object.freeze({
 		getSchema: base.getSchema,
 		getTableName: base.getTableName,
 		create: base.create,
 		get: base.get,
 		getById: base.getById,
+		getSeasons,
 		update: base.update,
 		updateById: base.updateById
 	});
