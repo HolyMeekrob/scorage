@@ -4,34 +4,17 @@ import koaRouter from 'koa-router';
 const router = koaRouter({ prefix: '/teams' });
 const bodyParser = koaBody();
 
+import baseController from './baseController';
+const base = baseController(teamModel);
+
 // Get all teams
-router.get('/', function* (next) {
-	this.type = 'application/json';
-
-	yield teamModel.get()
-		.then((teams) => {
-			this.body = teams;
-		});
-
-	yield next;
-});
+router.get('/', base.setJsonType, base.getAll);
 
 // Get team
-router.get('/:id', function* (next) {
-	this.type = 'application/json';
-
-	yield teamModel.getById(parseInt(this.params.id, 10))
-		.then((team) => {
-			this.body = team;
-		});
-
-	yield next;
-});
+router.get('/:id', base.setJsonType, base.getById);
 
 // Get roster
-router.get('/:id/roster', function* (next) {
-	this.type = 'application/json';
-
+router.get('/:id/roster', base.setJsonType, function* (next) {
 	yield teamModel.getRoster(parseInt(this.params.id, 10))
 		.then((players) => {
 			this.body = players;
@@ -41,32 +24,13 @@ router.get('/:id/roster', function* (next) {
 });
 
 // Create team
-router.post('/', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const newTeam = yield teamModel.create(this.request.body);
-	this.body = newTeam;
-
-	yield next;
-});
+router.post('/', bodyParser, base.setJsonType, base.createNew);
 
 // Update team
-router.put('/:id', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const updatedTeam = yield teamModel.updateById(
-		parseInt(this.params.id, 10), this.request.body);
-	this.body = updatedTeam;
-
-	yield next;
-});
+router.put('/:id', bodyParser, base.setJsonType, base.updateById);
 
 // Add player
-router.put('/:teamId/player/:playerId', function* (next) {
-	this.type = 'application/json';
-
+router.put('/:teamId/player/:playerId', base.setJsonType, function* (next) {
 	const updatedRoster = yield teamModel.addPlayer(
 		parseInt(this.params.playerId, 10), parseInt(this.params.teamId, 10));
 	this.body = updatedRoster;
@@ -75,9 +39,7 @@ router.put('/:teamId/player/:playerId', function* (next) {
 });
 
 // Remove player
-router.delete('/:teamId/player/:playerId', function* (next) {
-	this.type = 'application/json';
-
+router.delete('/:teamId/player/:playerId', base.setJsonType, function* (next) {
 	const updatedRoster = yield teamModel.removePlayer(
 		parseInt(this.params.playerId, 10), parseInt(this.params.teamId, 10));
 	this.body = updatedRoster;

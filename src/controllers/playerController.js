@@ -4,50 +4,19 @@ import koaRouter from 'koa-router';
 const router = koaRouter({ prefix: '/players' });
 const bodyParser = koaBody();
 
+import baseController from './baseController';
+const base = baseController(playerModel);
+
 // Get all players
-router.get('/', function* (next) {
-	this.type = 'application/json';
-
-	yield playerModel.get()
-		.then((players) => {
-			this.body = players;
-		});
-
-	yield next;
-});
+router.get('/', base.setJsonType, base.getAll);
 
 // Get player
-router.get('/:id', function* (next) {
-	this.type = 'application/json';
-
-	yield playerModel.getById(parseInt(this.params.id, 10))
-		.then((player) => {
-			this.body = player;
-		});
-
-	yield next;
-});
+router.get('/:id', base.setJsonType, base.getById);
 
 // Create player
-router.post('/', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const newPlayer = yield playerModel.create(this.request.body);
-	this.body = newPlayer;
-	yield next;
-});
+router.post('/', bodyParser, base.setJsonType, base.createNew);
 
 // Update player
-router.put('/:id', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const updatedPlayer = yield playerModel.updateById(
-		parseInt(this.params.id, 10), this.request.body);
-	this.body = updatedPlayer;
-
-	yield next;
-});
+router.put('/:id', bodyParser, base.setJsonType, base.updateById);
 
 export default router;

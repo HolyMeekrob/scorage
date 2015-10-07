@@ -4,51 +4,19 @@ import koaRouter from 'koa-router';
 const router = koaRouter({ prefix: '/leagues' });
 const bodyParser = koaBody();
 
+import baseController from './baseController';
+const base = baseController(leagueModel);
+
 // Get all leagues
-router.get('/', function* (next) {
-	this.type = 'application/json';
-
-	yield leagueModel.get()
-		.then((leagues) => {
-			this.body = leagues;
-		});
-
-	yield next;
-});
+router.get('/', base.setJsonType, base.getAll);
 
 // Get league
-router.get('/:id', function* (next) {
-	this.type = 'application/json';
-
-	yield leagueModel.getById(parseInt(this.params.id, 10))
-		.then((league) => {
-			this.body = league;
-		});
-
-	yield next;
-});
+router.get('/:id', base.setJsonType, base.getById);
 
 // Create league
-router.post('/', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const newLeague = yield leagueModel.create(this.request.body);
-	this.body = newLeague;
-
-	yield next;
-});
+router.post('/', bodyParser, base.setJsonType, base.createNew);
 
 // Update league
-router.put('/:id', bodyParser, function* (next) {
-	this.accepts('application/json');
-	this.type = 'application/json';
-
-	const updatedLeague = yield leagueModel.updateById(
-		parseInt(this.params.id, 10), this.request.body);
-	this.body = updatedLeague;
-
-	yield next;
-});
+router.put('/:id', bodyParser, base.setJsonType, base.updateById);
 
 export default router;
