@@ -47,6 +47,7 @@ router.post('/', bodyParser, function* (next) {
 
 	const newTeam = yield teamModel.create(this.request.body);
 	this.body = newTeam;
+
 	yield next;
 });
 
@@ -67,7 +68,18 @@ router.put('/:teamId/player/:playerId', function* (next) {
 	this.type = 'application/json';
 
 	const updatedRoster = yield teamModel.addPlayer(
-		parseInt(this.params.teamId, 10), parseInt(this.params.playerId, 10));
+		parseInt(this.params.playerId, 10), parseInt(this.params.teamId, 10));
+	this.body = updatedRoster;
+
+	yield next;
+});
+
+// Remove player
+router.delete('/:teamId/player/:playerId', function* (next) {
+	this.type = 'application/json';
+
+	const updatedRoster = yield teamModel.removePlayer(
+		parseInt(this.params.playerId, 10), parseInt(this.params.teamId, 10));
 	this.body = updatedRoster;
 
 	yield next;

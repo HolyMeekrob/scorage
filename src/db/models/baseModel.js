@@ -3,9 +3,6 @@ import queryBuilder from '../queries/queryBuilder';
 import { single } from '../../util';
 
 const baseModel = (schema) => {
-	// Deep copy schema
-	schema = Object.freeze(JSON.parse(JSON.stringify(schema)));
-
 	const makeSingle = (promise) => {
 		return promise.then((rows) => {
 			return Promise.resolve(single(rows));
@@ -17,7 +14,7 @@ const baseModel = (schema) => {
 	};
 
 	const getSchema = () => {
-		return Object.freeze(schema);
+		return schema;
 	};
 
 	const runQuery = (query) => {
@@ -32,7 +29,7 @@ const baseModel = (schema) => {
 	};
 
 	const del = (conditions) => {
-		return runQuery(queryBuilder.delete(schema, conditions));
+		return runQuery(queryBuilder.del(schema, conditions));
 	};
 
 	const deleteById = (id) => {

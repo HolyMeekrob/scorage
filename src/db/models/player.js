@@ -1,7 +1,8 @@
 import baseModel from './baseModel';
+import { deepFreeze } from '../../util';
 
 const player = (() => {
-	const schema = {
+	const schema = deepFreeze({
 		name: 'player',
 		canDelete: false,
 		columns: {
@@ -66,7 +67,7 @@ const player = (() => {
 				canUpdate: true
 			}
 		}
-	};
+	});
 
 	const base = baseModel(schema);
 

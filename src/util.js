@@ -66,6 +66,17 @@ const util = (() => {
 		return Array.from(a).filter((elem) => includes(b, elem));
 	};
 
+	const deepFreeze = (obj) => {
+		const propNames = Object.getOwnPropertyNames(obj);
+
+		propNames.filter((propName) => {
+			const prop = obj[propName];
+			return (typeof prop === 'object' && !Object.isFrozen(prop));
+		}).forEach((propName) => deepFreeze(obj[propName]));
+
+		return Object.freeze(obj);
+	};
+
 	return Object.freeze({
 		isNil,
 		single,
@@ -73,7 +84,8 @@ const util = (() => {
 		includes,
 		any,
 		difference,
-		intersection
+		intersection,
+		deepFreeze
 	});
 })();
 

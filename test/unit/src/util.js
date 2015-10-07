@@ -5,7 +5,8 @@ import {
 	any,
 	includes,
 	difference,
-	intersection
+	intersection,
+	deepFreeze
 } from '../../../src/util';
 
 import chai from 'chai';
@@ -453,6 +454,35 @@ describe('util', () => {
 				result.should.not.include(2);
 				result.should.not.include(5);
 				result.filter((x) => x === 1).length.should.equal(2);
+			});
+		});
+	});
+
+	describe('#deepFreeze()', () => {
+		describe('whwen given a non-object', () => {
+			it('should return the object', () => {
+				const val = 'not an object';
+				deepFreeze(val).should.equal(val);
+			});
+		});
+
+		describe('when given an object', () => {
+			it('should freeze the object', () => {
+				const obj = { prop: 'val' };
+
+				deepFreeze(obj);
+				Object.isFrozen(obj).should.be.true;
+			});
+		});
+
+		describe('when given an object with sub-object properties', () => {
+			it('should freeze all sub-objects', () => {
+				const obj = { sub1: { sub2: { prop: 'val' } } };
+				deepFreeze(obj);
+
+				Object.isFrozen(obj).should.be.true;
+				Object.isFrozen(obj.sub1).should.be.true;
+				Object.isFrozen(obj.sub1.sub2).should.be.true;
 			});
 		});
 	});

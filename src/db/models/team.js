@@ -1,9 +1,10 @@
 import baseModel from './baseModel';
 import player from './player';
 import roster from './rosterSpot';
+import { deepFreeze } from '../../util';
 
 const team = (() => {
-	const schema = {
+	const schema = deepFreeze({
 		name: 'team',
 		canDelete: false,
 		columns: {
@@ -56,7 +57,7 @@ const team = (() => {
 				canUpdate: true
 			}
 		}
-	};
+	});
 
 	const base = baseModel(schema);
 
@@ -69,20 +70,14 @@ const team = (() => {
 		);
 	};
 
-	const addPlayer = (teamId, playerId) => {
-		return roster.create({
-			team_id: teamId,
-			player_id: playerId,
-		}).then(() => {
-			return Promise.resolve(getRoster(teamId));
-		});
+	const addPlayer = (playerId, teamId) => {
+		return roster.addPlayerToTeam(playerId, teamId)
+			.then(() => Promise.resolve(getRoster(teamId)));
 	};
 
-	const removePlayer = (teamId, playerId) => {
+	const removePlayer = (playerId, teamId) => {
 		return roster.removePlayerFromTeam(teamId, playerId)
-			.then(() => {
-				return Promise.resolve(base.getById(teamId));
-			});
+			.then(() => Promise.resolve(getRoster(teamId)));
 	};
 
 	return Object.freeze({

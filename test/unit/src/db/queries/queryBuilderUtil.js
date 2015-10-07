@@ -127,10 +127,11 @@ describe('queryBuilderUtil', () => {
 		});
 
 		describe('when given a value and text type', () => {
-			it('should surround the value with single quotes', () => {
-				const val = 'blah';
+			it('should surround with and escape quotes', () => {
+				const val = 'bla\'h';
 
-				getFormattedValue(val, 'text').should.equal(`'${val}'`);
+				getFormattedValue(val, 'text')
+					.should.equal(`'${val.replace('\'', '\'\'')}'`);
 			});
 		});
 

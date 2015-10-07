@@ -28,6 +28,17 @@ router.get('/:id', function* (next) {
 	yield next;
 });
 
+// Create league
+router.post('/', bodyParser, function* (next) {
+	this.accepts('application/json');
+	this.type = 'application/json';
+
+	const newLeague = yield leagueModel.create(this.request.body);
+	this.body = newLeague;
+
+	yield next;
+});
+
 // Update league
 router.put('/:id', bodyParser, function* (next) {
 	this.accepts('application/json');

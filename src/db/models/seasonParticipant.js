@@ -1,18 +1,18 @@
 import baseModel from './baseModel';
 import { deepFreeze } from '../../util';
 
-const rosterSpot = (() => {
+const seasonParticipant = (() => {
 	const schema = deepFreeze({
-		name: 'roster_spot',
+		name: 'season_participant',
 		canDelete: true,
 		columns: {
-			player_id: {
+			team_id: {
 				type: 'number',
 				required: true,
 				canCreate: true,
 				canUpdate: false
 			},
-			team_id: {
+			season_id: {
 				type: 'number',
 				required: true,
 				canCreate: true,
@@ -23,23 +23,24 @@ const rosterSpot = (() => {
 
 	const base = baseModel(schema);
 
-	const addPlayerToTeam = (playerId, teamId) => {
+	const addTeamToSeason = (teamId, seasonId) => {
 		return base.create({
-			player_id: playerId,
-			team_id: teamId
+			team_id: teamId,
+			season_id: seasonId
 		});
 	};
 
-	const removePlayerFromTeam = (playerId, teamId) => {
-		return base.del([['team_id', teamId], ['player_id', playerId]]);
+	const removeTeamFromSeason = (teamId, seasonId) => {
+		return base.del([['team_id', teamId], ['season_id', seasonId]]);
 	};
 
 	return Object.freeze({
 		getSchema: base.getSchema,
 		getTableName: base.getTableName,
-		addPlayerToTeam,
-		removePlayerFromTeam
+		create: base.create,
+		addTeamToSeason,
+		removeTeamFromSeason
 	});
 })();
 
-export default rosterSpot;
+export default seasonParticipant;

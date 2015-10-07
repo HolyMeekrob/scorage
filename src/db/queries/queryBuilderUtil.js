@@ -35,7 +35,7 @@ const queryBuilderUtil = (() => {
 		}
 
 		if (type === 'text') {
-			return `'${value}'`;
+			return `'${value.replace('\'', '\'\'')}'`;
 		}
 
 		if (type === 'number') {
