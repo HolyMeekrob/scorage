@@ -65,6 +65,18 @@ const player = (() => {
 				required: false,
 				canCreate: true,
 				canUpdate: true
+			},
+			position: {
+				type: 'text',
+				required: false,
+				canCreate: true,
+				canUpdate: true
+			},
+			number: {
+				type: 'text',
+				required: false,
+				canCreate: true,
+				canUpdate: true
 			}
 		}
 	});

@@ -55,6 +55,12 @@ const team = (() => {
 				required: false,
 				canCreate: true,
 				canUpdate: true
+			},
+			home_location_id: {
+				type: 'number',
+				required: false,
+				canCreate: true,
+				canUpdate: true
 			}
 		}
 	});
