@@ -4,6 +4,7 @@ import leagueController from './controllers/leagueController';
 import seasonController from './controllers/seasonController';
 import locationController from './controllers/locationController';
 import gameController from './controllers/gameController';
+import rulesetController from './controllers/rulesetController';
 
 const router = (app) => {
 	const register = (controller) => {
@@ -18,6 +19,7 @@ const router = (app) => {
 		register(seasonController);
 		register(locationController);
 		register(gameController);
+		register(rulesetController);
 	};
 
 	return Object.freeze({
