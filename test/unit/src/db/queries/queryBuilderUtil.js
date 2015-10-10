@@ -111,6 +111,24 @@ describe('queryBuilderUtil', () => {
 				isTypeMatch({ id: 94 }, 'json').should.be.true;
 			});
 		});
+
+		describe('when given a non-string and unique type', () => {
+			it('should return false', () => {
+				isTypeMatch(181, 'unique').should.be.false;
+			});
+		});
+
+		describe('when given a non-uuid string and unique type', () => {
+			it('should return false', () => {
+				isTypeMatch('hello', 'unique').should.be.false;
+			});
+		});
+
+		describe('when given a uuid string and unique type', () => {
+			it('should return true', () => {
+				isTypeMatch('A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11', 'unique').should.be.true;
+			});
+		});
 	});
 
 	describe('#getFormattedValue()', () => {
@@ -132,6 +150,14 @@ describe('queryBuilderUtil', () => {
 
 				getFormattedValue(val, 'text')
 					.should.equal(`'${val.replace('\'', '\'\'')}'`);
+			});
+		});
+
+		describe('when given a value and unique type', () => {
+			it('should return the value', () => {
+				const val = 'CA761232-ED42-11CE-BACD-00AA0057B223';
+
+				getFormattedValue(val, 'unique').should.equal(val);
 			});
 		});
 

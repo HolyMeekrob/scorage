@@ -14,6 +14,12 @@ const queryBuilderUtil = (() => {
 			return typeof value === 'string';
 		}
 
+		if (type === 'unique') {
+			const uuidRegex =
+				/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/;
+			return (typeof value === 'string') && uuidRegex.test(value);
+		}
+
 		if (type === 'number') {
 			return typeof value === 'number';
 		}
@@ -36,6 +42,10 @@ const queryBuilderUtil = (() => {
 
 		if (type === 'text') {
 			return `'${value.replace('\'', '\'\'')}'`;
+		}
+
+		if (type === 'unique') {
+			return value;
 		}
 
 		if (type === 'number') {
