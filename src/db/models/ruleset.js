@@ -8,8 +8,8 @@ const ruleset = (() => {
 		columns: {
 			id: {
 				type: 'number',
-				required: true,
-				canCreate: true,
+				required: false,
+				canCreate: false,
 				canUpdate: false
 			},
 			game_id: {

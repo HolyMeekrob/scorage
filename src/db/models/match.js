@@ -1,10 +1,10 @@
 import baseModel from './baseModel';
 import { deepFreeze } from '../../util';
 
-const game = (() => {
+const match = (() => {
 	const schema = deepFreeze({
-		name: 'game',
-		canDelete: false,
+		name: 'match',
+		canDelete: true,
 		columns: {
 			id: {
 				type: 'number',
@@ -12,15 +12,21 @@ const game = (() => {
 				canCreate: false,
 				canUpdate: false
 			},
-			formatter_id: {
-				type: 'unique',
+			away_team_id: {
+				type: 'number',
 				required: true,
 				canCreate: true,
 				canUpdate: false
 			},
-			name: {
-				type: 'text',
+			home_team_id: {
+				type: 'number',
 				required: true,
+				canCreate: true,
+				canUpdate: false
+			},
+			match_site_id: {
+				type: 'number',
+				required: false,
 				canCreate: true,
 				canUpdate: true
 			}
@@ -29,20 +35,16 @@ const game = (() => {
 
 	const base = baseModel(schema);
 
-	const getByFormatterId = (formatterId) => {
-		return base.get(undefined, [['formatter_id', formatterId]]);
-	};
-
 	return Object.freeze({
 		getSchema: base.getSchema,
 		getTableName: base.getTableName,
 		create: base.create,
 		get: base.get,
 		getById: base.getById,
-		getByFormatterId,
 		update: base.update,
-		updateById: base.updateById
+		updateById: base.updateById,
+		deleteById: base.deleteById
 	});
 })();
 
-export default game;
+export default match;
