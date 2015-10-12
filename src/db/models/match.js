@@ -29,6 +29,12 @@ const match = (() => {
 				required: false,
 				canCreate: true,
 				canUpdate: true
+			},
+			season_id: {
+				type: 'number',
+				required: false,
+				canCreate: true,
+				canUpdate: true
 			}
 		}
 	});
