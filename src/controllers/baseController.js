@@ -41,12 +41,22 @@ const baseController = (model) => {
 		yield next;
 	};
 
+	const deleteById = function* (next) {
+		yield model.deleteById(parseInt(this.params.id, 10))
+			.then((row) => {
+				this.body = row;
+			});
+
+		yield next;
+	};
+
 	return Object.freeze({
 		setJsonType,
 		getAll,
 		getById,
 		createNew,
-		updateById
+		updateById,
+		deleteById
 	});
 };
 

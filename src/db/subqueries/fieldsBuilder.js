@@ -1,4 +1,4 @@
-import { isNil } from '../../util';
+import { any, isNil } from '../../util';
 
 const fieldsBuilder = (() => {
 	const checkFields = (fieldsToCheck) => {
@@ -14,7 +14,7 @@ const fieldsBuilder = (() => {
 	};
 
 	const getFieldsString = (fields) => {
-		if (isNil(fields) || fields.length === 0) {
+		if (isNil(fields) || !any(fields)) {
 			return '*';
 		}
 

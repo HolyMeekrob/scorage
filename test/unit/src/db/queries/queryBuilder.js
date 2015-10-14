@@ -220,6 +220,26 @@ describe('queryBuilder', () => {
 				result[4].should.equal(joins[0][1]);
 			});
 		});
+
+		describe('when given sorts', () => {
+			it('should select with the given sort', () => {
+				const schema = {
+					name: 'theTable'
+				};
+
+				const sorts = ['alpha', 'beta'];
+
+				const regex = /^(?:SELECT|select) (\S+) (?:FROM|from) (\S+) (?:ORDER BY|order by) (.+)$/;
+
+				const query = queryBuilder.select(schema, undefined, undefined, undefined, sorts);
+				const result = regex.exec(query);
+
+				result.should.not.be.null;
+				result[1].should.equal('*');
+				result[2].should.equal(schema.name);
+				result[3].replace(/ /g, '').should.equal(sorts.join(','));
+			});
+		});
 	});
 
 	describe('#insert()', () => {

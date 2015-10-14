@@ -1,29 +1,25 @@
-import matchModel from '../db/models/match';
+import playModel from '../db/models/play';
 import koaBody from 'koa-body';
 import koaRouter from 'koa-router';
-const router = koaRouter({ prefix: '/matches' });
+const router = koaRouter({ prefix: '/plays' });
 const bodyParser = koaBody();
 
 import baseController from './baseController';
-const base = baseController(matchModel);
+const base = baseController(playModel);
 
-// Get all matches
+// Get all plays
 router.get('/', base.setJsonType, base.getAll);
 
-// Get match
+// Get play
 router.get('/:id', base.setJsonType, base.getById);
 
-// Get match plays (in order)
-router.get('/:id/plays', base.setJsonType, function * (next) {
-	yield matchModel.getMatchPlays(parseInt(this.params.id, 10));
-
-	yield next;
-});
-
-// Create match
+// Create game
 router.post('/', bodyParser, base.setJsonType, base.createNew);
 
-// Update match
+// Update game
 router.put('/:id', bodyParser, base.setJsonType, base.updateById);
+
+// Delete game
+router.delete('/:id', base.setJsonType, base.deleteById);
 
 export default router;

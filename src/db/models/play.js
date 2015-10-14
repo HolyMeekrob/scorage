@@ -1,10 +1,9 @@
 import baseModel from './baseModel';
-import playModel from './play';
 import { deepFreeze } from '../../util';
 
-const match = (() => {
+const play = (() => {
 	const schema = deepFreeze({
-		name: 'match',
+		name: 'play',
 		canDelete: true,
 		columns: {
 			id: {
@@ -13,27 +12,15 @@ const match = (() => {
 				canCreate: false,
 				canUpdate: false
 			},
-			away_team_id: {
+			match_id: {
 				type: 'number',
 				required: true,
 				canCreate: true,
 				canUpdate: false
 			},
-			home_team_id: {
-				type: 'number',
+			details: {
+				type: 'json',
 				required: true,
-				canCreate: true,
-				canUpdate: false
-			},
-			match_site_id: {
-				type: 'number',
-				required: false,
-				canCreate: true,
-				canUpdate: true
-			},
-			season_id: {
-				type: 'number',
-				required: false,
 				canCreate: true,
 				canUpdate: true
 			}
@@ -42,8 +29,9 @@ const match = (() => {
 
 	const base = baseModel(schema);
 
-	const getMatchPlays = (id) => {
-		return playModel.getPlaysByMatchId(id);
+	const getPlaysByMatchId = (matchId) => {
+		return base.getComplex(schema, ['details'], undefined,
+			[['match_id', matchId]], ['id']);
 	};
 
 	return Object.freeze({
@@ -52,11 +40,11 @@ const match = (() => {
 		create: base.create,
 		get: base.get,
 		getById: base.getById,
-		getMatchPlays,
+		getPlaysByMatchId,
 		update: base.update,
 		updateById: base.updateById,
 		deleteById: base.deleteById
 	});
 })();
 
-export default match;
+export default play;

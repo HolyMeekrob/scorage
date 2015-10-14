@@ -16,7 +16,7 @@ const util = (() => {
 			throw new Error('');
 		}
 
-		if (arr.length === 0) {
+		if (!any(arr)) {
 			return {};
 		}
 

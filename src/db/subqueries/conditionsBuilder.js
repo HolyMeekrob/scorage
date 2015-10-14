@@ -1,4 +1,4 @@
-import { isNil } from '../../util';
+import { any, isNil } from '../../util';
 
 const conditionsBuilder = (() => {
 	const checkConditions = (conditionsToCheck) => {
@@ -30,7 +30,7 @@ const conditionsBuilder = (() => {
 	};
 
 	const getConditionsString = (conditions) => {
-		if (isNil(conditions) || conditions.length === 0) {
+		if (isNil(conditions) || !any(conditions)) {
 			return '';
 		}
 
