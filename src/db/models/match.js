@@ -36,13 +36,19 @@ const match = (() => {
 				required: false,
 				canCreate: true,
 				canUpdate: true
+			},
+			rulset_id: {
+				type: 'number',
+				required: true,
+				canCreate: true,
+				canUpdate: false
 			}
 		}
 	});
 
 	const base = baseModel(schema);
 
-	const getMatchPlays = (id) => {
+	const getPlays = (id) => {
 		return playModel.getPlaysByMatchId(id);
 	};
 
@@ -52,7 +58,7 @@ const match = (() => {
 		create: base.create,
 		get: base.get,
 		getById: base.getById,
-		getMatchPlays,
+		getPlays,
 		update: base.update,
 		updateById: base.updateById,
 		deleteById: base.deleteById
