@@ -1,18 +1,18 @@
 import baseModel from './baseModel';
 
 export default (getDataStore) => {
-	const base = baseModel(getDataStore, 'game');
+	const base = baseModel(getDataStore, 'ruleset');
 	const { create, get, getById, update, updateById } = base;
 
-	const getByFormatterId = (formatterId) => {
-		return getDataStore().game.getByFormatterId(formatterId);
+	const getByGameId = (gameId) => {
+		return getDataStore().ruleset.getByGameId(gameId);
 	};
 
 	return Object.freeze({
 		create,
 		get,
-		getByFormatterId,
 		getById,
+		getByGameId,
 		update,
 		updateById
 	});
