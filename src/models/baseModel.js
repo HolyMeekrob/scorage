@@ -1,6 +1,6 @@
 export default (getDataStore, modelName) => {
 	const getModel = () => {
-		getDataStore()[modelName];
+		return getDataStore()[modelName];
 	};
 
 	const create = (vals) => {
