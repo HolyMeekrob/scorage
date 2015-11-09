@@ -1,7 +1,7 @@
 import gulp from 'gulp';
 import mocha from 'gulp-mocha';
 import eslint from 'gulp-eslint';
-import {} from 'babel/register';
+import {} from 'babel-core/register';
 
 gulp.task('lint', () => {
 	return gulp.src(['src/**/*.js'])
